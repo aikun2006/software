@@ -1,0 +1,105 @@
+{
+  "pages": [
+    {
+      "path": "pages/visitor/index",
+      "style": {
+        "navigationBarTitleText": "AI数字人导游",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/visitor/chat",
+      "style": {
+        "navigationBarTitleText": "智能导览",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/visitor/routes",
+      "style": {
+        "navigationBarTitleText": "游览路线",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/visitor/location",
+      "style": {
+        "navigationBarTitleText": "位置追踪",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/admin/login",
+      "style": {
+        "navigationBarTitleText": "管理员登录"
+      }
+    },
+    {
+      "path": "pages/admin/index",
+      "style": {
+        "navigationBarTitleText": "管理后台",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/admin/knowledge",
+      "style": {
+        "navigationBarTitleText": "知识库管理",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/admin/avatar",
+      "style": {
+        "navigationBarTitleText": "数字人管理",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/admin/report",
+      "style": {
+        "navigationBarTitleText": "数据报告",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/admin/dashboard",
+      "style": {
+        "navigationBarTitleText": "数据大屏",
+        "navigationStyle": "custom"
+      }
+    }
+  ],
+  "globalStyle": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "AI导览",
+    "navigationBarBackgroundColor": "#ffffff",
+    "backgroundColor": "#f5f7fa"
+  },
+  "tabBar": {
+    "color": "#999999",
+    "selectedColor": "#4080ff",
+    "borderStyle": "black",
+    "backgroundColor": "#ffffff",
+    "list": [
+      {
+        "pagePath": "pages/visitor/index",
+        "text": "首页",
+        "iconPath": "static/icons/home.png",
+        "selectedIconPath": "static/icons/home-active.png"
+      },
+      {
+        "pagePath": "pages/visitor/chat",
+        "text": "导览",
+        "iconPath": "static/icons/chat.png",
+        "selectedIconPath": "static/icons/chat-active.png"
+      },
+      {
+        "pagePath": "pages/visitor/routes",
+        "text": "路线",
+        "iconPath": "static/icons/routes.png",
+        "selectedIconPath": "static/icons/routes-active.png"
+      }
+    ]
+  }
+}
