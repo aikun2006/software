@@ -1,0 +1,30 @@
+灵山导览服务器: http://localhost:8080
+访问口令: lingshan2026（环境变量 LINGSHAN_PASS 可覆盖）
+文本AI: 硅基流动 Qwen2.5-72B
+多模态: 智谱 GLM-4V-Flash
+TTS语音: 微软晓晓 (zh-CN-XiaoxiaoNeural)
+[24/Jun/2026 10:44:03] "GET /assets/pages-visitor-routes.BEuTCgur.js HTTP/1.1" 200 -
+[24/Jun/2026 10:44:03] "GET /assets/routes-CzjOFjJa.css HTTP/1.1" 200 -
+[24/Jun/2026 10:44:05] "GET / HTTP/1.1" 200 -
+[24/Jun/2026 10:44:06] "GET / HTTP/1.1" 200 -
+[24/Jun/2026 10:44:13] "GET /favicon.ico HTTP/1.1" 200 -
+[24/Jun/2026 10:44:13] "GET / HTTP/1.1" 200 -
+[24/Jun/2026 10:44:13] "GET /favicon.ico HTTP/1.1" 200 -
+[24/Jun/2026 10:44:22] "GET / HTTP/1.1" 200 -
+[24/Jun/2026 10:44:23] "GET /favicon.ico HTTP/1.1" 200 -
+[24/Jun/2026 10:44:23] "GET /favicon.ico HTTP/1.1" 200 -
+[24/Jun/2026 10:45:24] "GET / HTTP/1.1" 200 -
+[24/Jun/2026 10:45:24] "POST /api/chat HTTP/1.1" 401 -
+[24/Jun/2026 10:45:24] "POST /api/login HTTP/1.1" 200 -
+登录成功，已签发会话。
+[24/Jun/2026 10:45:24] "GET / HTTP/1.1" 200 -
+Chat: 转发到 硅基流动...
+Chat (硅基流动) Error: HTTP Error 400: Bad Request
+[24/Jun/2026 10:45:24] "POST /api/chat HTTP/1.1" 500 -
+[24/Jun/2026 10:46:10] "GET / HTTP/1.1" 200 -
+[24/Jun/2026 10:46:10] "POST /api/login HTTP/1.1" 200 -
+登录成功，已签发会话。
+[24/Jun/2026 10:46:10] "GET / HTTP/1.1" 200 -
+[24/Jun/2026 10:46:42] "GET / HTTP/1.1" 200 -
+[24/Jun/2026 10:50:25] "POST /api/shutdown HTTP/1.1" 200 -
+收到关闭请求，服务器退出。

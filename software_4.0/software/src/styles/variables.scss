@@ -1,0 +1,54 @@
+$primary-color: #8B7355;
+$primary-light: #f5f0e6;
+$primary-dark: #6B5640;
+
+$success-color: #52c41a;
+$warning-color: #faad14;
+$error-color: #ff4d4f;
+$info-color: #1890ff;
+
+$text-primary: #333333;
+$text-secondary: #666666;
+$text-light: #999999;
+$text-placeholder: #cccccc;
+
+$bg-color: #f7f2e3;
+$bg-white: #fffdf5;
+$bg-gray: #f0e8d2;
+
+$border-color: #e8e8e8;
+$border-radius: 8rpx;
+$border-radius-lg: 16rpx;
+$border-radius-xl: 24rpx;
+
+$shadow-sm: 0 2rpx 8rpx rgba(0, 0, 0, 0.06);
+$shadow-md: 0 4rpx 16rpx rgba(0, 0, 0, 0.08);
+$shadow-lg: 0 8rpx 32rpx rgba(0, 0, 0, 0.12);
+
+$font-size-xs: 22rpx;
+$font-size-sm: 24rpx;
+$font-size-base: 28rpx;
+$font-size-lg: 32rpx;
+$font-size-xl: 36rpx;
+$font-size-xxl: 44rpx;
+$font-size-title: 56rpx;
+
+$spacing-xs: 8rpx;
+$spacing-sm: 16rpx;
+$spacing-base: 24rpx;
+$spacing-lg: 32rpx;
+$spacing-xl: 48rpx;
+
+$transition-fast: 0.15s ease;
+$transition-base: 0.25s ease;
+$transition-slow: 0.4s ease;
+
+// ===== 寺庙导览APP字体规范（四层分层字体） =====
+// Tier 1: 页面匾额、首页大殿大标题
+$font-plaque: "PangMenZhengDao-Cu6.0", serif;
+// Tier 2: 导航点位、侧边菜单、二级小标题（使用粗体）
+$font-nav: "LXGW WenKai", serif;
+// Tier 3: 详情长文本、寺庙历史、佛经、碑文正文（常规体, line-height 1.4）
+$font-body: "LXGW WenKai", serif;
+// Tier 4: 页面角落楹联、落款、装饰禅语小字（仅装饰）
+$font-decor: "临海体", serif;
