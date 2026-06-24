@@ -41,9 +41,9 @@ End Function
 Function ExtractURL()
     Dim ts, content, re, m
     content = ""
-    If fso.FileExists(errFile) Then
+    If fso.FileExists(outFile) Then
         On Error Resume Next
-        Set ts = fso.OpenTextFile(errFile, 1)
+        Set ts = fso.OpenTextFile(outFile, 1)
         content = ts.ReadAll
         ts.Close
         On Error GoTo 0
@@ -115,5 +115,5 @@ If urlStr <> "" Then
              "隧道后台运行，关掉本弹窗不影响。", 0, "灵山导览 公网隧道", 64
 Else
     sh.Popup "隧道已启动，但网址还没抓到。" & vbCrLf & _
-             "请等几秒后再双击本文件，或查看：" & vbCrLf & errFile, 0, "灵山导览", 48
+             "请等几秒后再双击本文件，或查看：" & vbCrLf & outFile, 0, "灵山导览", 48
 End If
