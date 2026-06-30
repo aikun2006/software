@@ -1,6 +1,6 @@
 <template>
   <view class="chat-container">
-    <view class="left-panel">
+    <view class="left-panel" v-show="!isMobile || mobileAvatarVisible">
       <view class="panel-header">
         <text class="panel-title">AI导游 - 小乐</text>
         <view class="online-status">
@@ -8,14 +8,14 @@
           <text>在线服务</text>
         </view>
       </view>
-      
+
       <view class="avatar-section">
-        <SimpleAvatar2D ref="avatarRef" />
+        <Avatar3D ref="avatarRef" />
         <view class="avatar-footer">
           <text class="avatar-label">3D虚拟导游 | 支持语音交互</text>
         </view>
       </view>
-      
+
       <view class="action-btn-wrapper">
         <button class="voice-btn" @click="toggleVoiceMode">
           <text class="btn-icon">{{ isVoiceMode ? '✏️' : '🎤' }}</text>
@@ -27,6 +27,9 @@
     <view class="center-panel">
       <view class="panel-header chat-header">
         <view class="header-left">
+          <view class="mobile-avatar-toggle" @click="toggleMobileAvatar">
+            <text>{{ mobileAvatarVisible ? '◀' : '▶' }}</text>
+          </view>
           <view class="header-title-group">
             <text class="title-text">智能对话</text>
           </view>
@@ -52,6 +55,17 @@
         :scroll-with-animation="true"
         @scrolltolower="loadMore"
       >
+        <!-- 骨架屏：消息列表为空时的渐进式加载占位 -->
+        <view v-if="messages.length === 0 && !isTyping" class="skeleton-list">
+          <view class="skeleton-item" v-for="n in 4" :key="n">
+            <view class="skeleton-avatar"></view>
+            <view class="skeleton-bubble">
+              <view class="skeleton-line"></view>
+              <view class="skeleton-line short"></view>
+            </view>
+          </view>
+        </view>
+
         <!-- 已完成的对话消息 -->
         <view
           class="message-item"
@@ -193,12 +207,24 @@ import { mockAvatars } from '@/data/mock'
 import { aiResponder } from '@/utils/aiResponder-doubao'
 import { getSafeImageUrl } from '@/utils/imageConfig'
 import { ttsEngine } from '@/utils/ttsEngine'
-import SimpleAvatar2D from '@/components/SimpleAvatar2D.vue'
+import Avatar3D from '@/components/Avatar3D.vue'
 
 const chatStore = useChatStore()
 const currentAvatar = ref<AvatarConfig>(mockAvatars[0])
 const avatarRef = ref()
 const inputRef = ref()
+
+// 响应式布局：移动端(<768px)默认折叠数字人区，通过顶部按钮控制显隐
+const isMobile = ref(typeof window !== 'undefined' && window.innerWidth < 768)
+const mobileAvatarVisible = ref(false)
+function toggleMobileAvatar() {
+  mobileAvatarVisible.value = !mobileAvatarVisible.value
+}
+if (typeof window !== 'undefined') {
+  window.addEventListener('resize', () => {
+    isMobile.value = window.innerWidth < 768
+  })
+}
 
 // 直接使用 store 的 messages（Pinia store 的 ref 在组件中自动解包，无需 .value）
 const messages = chatStore.messages
@@ -439,9 +465,10 @@ const sendText = async () => {
   scrollToBottom()
 
   // 2. 显示 loading（等 AI 回复 + 可能等 TTS 合成）
+  //    3D 数字人思考态：表情回归自然，不张嘴（原 2D 版在此处会一直抖嘴，3D 版更自然）
   isPreparing.value = true
   if (avatarRef.value) {
-    avatarRef.value.startSpeaking()
+    avatarRef.value.setExpression('neutral')
   }
 
   try {
@@ -493,6 +520,11 @@ const sendText = async () => {
     isTyping.value = true
     typingContent.value = ''
 
+    // 【3D 数字人联动】用文本驱动伪口型，让嘴型与正在播报的内容同步
+    if (avatarRef.value) {
+      avatarRef.value.speakText(fullText)
+    }
+
     // 语音播报开启 → 播放语音
     if (audioData && audioData.byteLength > 0) {
       ttsEngine.play(audioData)
@@ -521,7 +553,9 @@ const sendText = async () => {
     })
     scrollToBottom()
 
+    // 【3D 数字人联动】根据 AI 情绪驱动表情：positive→开心, negative→难过, neutral→自然
     if (avatarRef.value) {
+      avatarRef.value.setEmotion(emotion)
       avatarRef.value.stopSpeaking()
     }
   } catch (err) {
@@ -741,40 +775,54 @@ onUnmounted(() => {
 <style lang="scss" scoped>
 @import "@/styles/variables.scss";
 
+/* ====== 布局容器：两栏（桌面）/纵向（移动端），中性背景 ====== */
 .chat-container {
   display: flex;
   height: 100vh;
-  background: #f7f2e3;
+  background: #F5F7FA;
   font-family: $font-body;
-  line-height: 1.4;
-  
-  @media screen and (max-width: 768px) {
+  line-height: 1.5;
+
+  /* 响应式断点 - 移动端(<768px)：纵向布局，数字人区可折叠 */
+  @media screen and (max-width: 767px) {
     flex-direction: column;
   }
 }
 
+/* ====== 左侧 3D 数字人区域：宽度 30%(±2%)，黄色 #FFD700 背景 ====== */
 .left-panel {
-  width: 280rpx;
-  background: linear-gradient(180deg, #c4a45a 0%, #9a7630 100%);
+  width: 30%;
+  min-width: 28%;
+  max-width: 32%;
+  min-height: 400px;
+  max-height: 80vh;
+  background: #FFD700;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: space-between;
   padding: 32rpx 24rpx;
-  
-  @media screen and (max-width: 768px) {
+  box-sizing: border-box;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 2;
+
+  /* 移动端：折叠时占满宽度，高度收窄 */
+  @media screen and (max-width: 767px) {
     width: 100%;
-    padding: 24rpx;
+    max-width: 100%;
+    min-height: 320px;
+    max-height: 50vh;
   }
 }
 
 .panel-header {
   text-align: center;
   margin-bottom: 24rpx;
-  
+
   .panel-title {
     display: block;
     font-size: 32rpx;
-    color: #fff;
+    color: #2b2b2b;
     margin-bottom: 12rpx;
     font-family: $font-plaque;
     letter-spacing: 4rpx;
@@ -786,16 +834,16 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   gap: 8rpx;
-  
+
   text {
-    font-size: 24rpx;
-    color: rgba(255, 255, 255, 0.8);
+    font-size: 28rpx;
+    color: rgba(43, 43, 43, 0.7);
   }
 }
 
 .status-dot {
-  width: 12rpx;
-  height: 12rpx;
+  width: 14rpx;
+  height: 14rpx;
   background: #52c41a;
   border-radius: 50%;
 }
@@ -806,6 +854,7 @@ onUnmounted(() => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  width: 100%;
 }
 
 .avatar-footer {
@@ -813,63 +862,94 @@ onUnmounted(() => {
 }
 
 .avatar-label {
-  font-size: 22rpx;
-  color: rgba(255, 255, 255, 0.7);
+  font-size: 28rpx;
+  color: rgba(43, 43, 43, 0.6);
 }
 
 .action-btn-wrapper {
-  margin-top: 24rpx;
+  margin-top: auto;
   width: 100%;
+  flex-shrink: 0;
+  padding-top: 16rpx;
 }
 
 .voice-btn {
   width: 100%;
-  height: 80rpx;
-  background: rgba(255, 255, 255, 0.2);
+  height: 88rpx;
+  background: rgba(255, 255, 255, 0.35);
   border: none;
-  border-radius: 40rpx;
+  border-radius: 44rpx;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 12rpx;
-  
+
   .btn-icon {
     font-size: 36rpx;
   }
-  
+
   .btn-text {
-    font-size: 26rpx;
-    color: #fff;
+    font-size: 28rpx;
+    color: #2b2b2b;
     font-family: $font-body;
     letter-spacing: 2rpx;
     white-space: nowrap;
   }
-  
+
   &:active {
-    background: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.5);
   }
 }
 
+/* 移动端折叠按钮：仅在 <768px 显示，桌面端隐藏 */
+.mobile-avatar-toggle {
+  display: none;
+  width: 56rpx;
+  height: 56rpx;
+  align-items: center;
+  justify-content: center;
+  background: #E4E7ED;
+  border-radius: 12rpx;
+  cursor: pointer;
+  flex-shrink: 0;
+
+  text {
+    font-size: 28rpx;
+    color: #606266;
+  }
+
+  &:active {
+    background: #d3d6db;
+  }
+
+  @media screen and (max-width: 767px) {
+    display: flex;
+  }
+}
+
+/* ====== 右侧聊天画布：纯白 #FFFFFF 背景，阴影分层 ====== */
 .center-panel {
   flex: 1;
   display: flex;
   flex-direction: column;
-  background: #fff;
-  margin: 16rpx 16rpx 16rpx 24rpx;  /* 左边距加大，拉开与数字人面板的间距 */
-  border-radius: 24rpx;
-  box-shadow: 0 4rpx 24rpx rgba(0, 0, 0, 0.08);
+  background: #FFFFFF;
+  margin: 16rpx 16rpx 16rpx 24rpx;
+  border-radius: 16rpx;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   min-height: 0;
+  overflow: hidden;
 
-  @media screen and (max-width: 768px) {
+  @media screen and (max-width: 767px) {
     margin: 8rpx;
     flex: none;
     flex-grow: 1;
   }
 }
 
+/* ====== 聊天头部：中性色调，简约 ====== */
 .chat-header {
-  padding: 20rpx 28rpx;
-  border-bottom: 2rpx solid #f0f0f0;
+  padding: 24rpx 32rpx;
+  border-bottom: 1rpx solid #E4E7ED;
   flex-shrink: 0;
   display: flex;
   align-items: center;
@@ -878,7 +958,7 @@ onUnmounted(() => {
   .header-left {
     display: flex;
     align-items: center;
-    gap: 12rpx;
+    gap: 16rpx;
   }
 
   .header-title-group {
@@ -890,37 +970,22 @@ onUnmounted(() => {
   .header-right {
     display: flex;
     align-items: center;
-    gap: 20rpx;
+    gap: 24rpx;
   }
-}
-
-.title-icon {
-  font-size: 36rpx;
 }
 
 .title-text {
   font-size: 38rpx;
-  color: #333;
+  color: #303133;
   font-family: $font-plaque;
   letter-spacing: 4rpx;
-}
-
-.subtitle {
-  font-size: 20rpx;
-  color: #bbb;
-}
-
-.header-controls {
-  display: flex;
-  align-items: center;
-  gap: 32rpx;
 }
 
 .toggle-switch {
   display: flex;
   align-items: center;
-  padding: 8rpx 20rpx;
-  background: #f0f0f0;
+  padding: 12rpx 24rpx;
+  background: #F5F7FA;
   border-radius: 36rpx;
   cursor: pointer;
   transition: all 0.3s;
@@ -934,8 +999,8 @@ onUnmounted(() => {
   }
 
   .toggle-label {
-    font-size: 24rpx;
-    color: #666;
+    font-size: 28rpx;
+    color: #606266;
     white-space: nowrap;
     font-family: $font-nav;
     letter-spacing: 2rpx;
@@ -948,47 +1013,47 @@ onUnmounted(() => {
   gap: 8rpx;
 
   text {
-    font-size: 22rpx;
+    font-size: 28rpx;
     color: #52c41a;
     font-family: $font-nav;
   }
 }
 
 .connection-dot {
-  width: 10rpx;
-  height: 10rpx;
+  width: 12rpx;
+  height: 12rpx;
   background: #52c41a;
   border-radius: 50%;
 }
 
 .map-btn {
-  width: 72rpx;
-  height: 72rpx;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #8B7355 0%, #A0522D 100%);
+  min-width: 88rpx;
+  min-height: 88rpx;
+  padding: 0 24rpx;
+  border-radius: 12rpx;
+  background: #F5F7FA;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4rpx 12rpx rgba(139, 115, 85, 0.4);
-  border: 2rpx solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   cursor: pointer;
   flex-shrink: 0;
   transition: transform 0.2s;
 
   &:active {
-    transform: scale(0.92);
+    transform: scale(0.95);
   }
 }
 
 .map-btn-text {
-  font-size: 30rpx;
-  color: #f5f0e6;
+  font-size: 28rpx;
+  color: #606266;
   font-family: $font-body;
   letter-spacing: 2rpx;
-  font-weight: normal;
   line-height: 1;
 }
 
+/* ====== 消息列表：虚拟滚动由 scroll-view 原生支持 ====== */
 .chat-messages {
   flex: 1;
   height: 0;
@@ -997,21 +1062,68 @@ onUnmounted(() => {
   box-sizing: border-box;
 }
 
+/* ====== 骨架屏：消息为空时渐进式加载占位 ====== */
+.skeleton-list {
+  display: flex;
+  flex-direction: column;
+  gap: 32rpx;
+  padding: 16rpx 0;
+}
+
+.skeleton-item {
+  display: flex;
+  gap: 16rpx;
+  align-items: flex-start;
+}
+
+.skeleton-avatar {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 50%;
+  background: #F5F7FA;
+  flex-shrink: 0;
+  animation: skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+.skeleton-bubble {
+  flex: 1;
+  max-width: 60%;
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+}
+
+.skeleton-line {
+  height: 28rpx;
+  background: #F5F7FA;
+  border-radius: 8rpx;
+  animation: skeleton-pulse 1.5s ease-in-out infinite;
+
+  &.short {
+    width: 60%;
+  }
+}
+
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
 .message-item {
   display: flex;
   margin-bottom: 24rpx;
-  
+
   &.user-message {
     justify-content: flex-end;
-    
+
     .message-bubble {
-      background: linear-gradient(135deg, #c4a45a 0%, #9a7630 100%);
-      
+      background: #E4E7ED;
+
       text {
-        color: #fff;
+        color: #303133;
       }
     }
-    
+
     .message-content {
       align-items: flex-end;
     }
@@ -1023,9 +1135,9 @@ onUnmounted(() => {
   height: 72rpx;
   border-radius: 50%;
   flex-shrink: 0;
-  
+
   &.user-avatar {
-    background: #f0f0f0;
+    background: #E4E7ED;
   }
 }
 
@@ -1036,11 +1148,12 @@ onUnmounted(() => {
   margin: 0 16rpx;
 }
 
+/* ====== 消息气泡：圆角，与背景清晰分离 ====== */
 .message-bubble {
-  background: #f5f5f5;
-  padding: 20rpx 24rpx;
+  background: #F5F7FA;
+  padding: 20rpx 28rpx;
   border-radius: 24rpx;
-  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 
   .msg-image {
     display: block;
@@ -1053,8 +1166,8 @@ onUnmounted(() => {
 
   text {
     font-size: 28rpx;
-    color: #333;
-    line-height: 1.4;
+    color: #303133;
+    line-height: 1.5;
     font-family: $font-body;
   }
 
@@ -1065,7 +1178,7 @@ onUnmounted(() => {
 
 .message-time {
   font-size: 22rpx;
-  color: #999;
+  color: #909399;
   margin-top: 8rpx;
   font-family: $font-decor;
 }
@@ -1080,8 +1193,8 @@ onUnmounted(() => {
 }
 
 .loading-text {
-  font-size: 26rpx;
-  color: #999;
+  font-size: 28rpx;
+  color: #909399;
 }
 
 .loading-dots {
@@ -1092,21 +1205,17 @@ onUnmounted(() => {
 .dot {
   width: 16rpx;
   height: 16rpx;
-  background: #c4a45a;
+  background: #909399;
   border-radius: 50%;
   animation: loading 1.4s infinite ease-in-out both;
-  
+
   &:nth-child(1) { animation-delay: -0.32s; }
   &:nth-child(2) { animation-delay: -0.16s; }
 }
 
 @keyframes loading {
-  0%, 80%, 100% {
-    transform: scale(0);
-  }
-  40% {
-    transform: scale(1);
-  }
+  0%, 80%, 100% { transform: scale(0); }
+  40% { transform: scale(1); }
 }
 
 @keyframes blink {
@@ -1117,20 +1226,20 @@ onUnmounted(() => {
 .typing-cursor {
   display: inline;
   font-size: 28rpx;
-  color: #c4a45a;
+  color: #909399;
   margin-left: 4rpx;
   animation: blink 1s infinite;
 }
 
+/* ====== 输入区：简约，触控友好 ====== */
 .chat-input-area {
   display: flex;
   flex-direction: column;
   padding: 0 24rpx 20rpx;
-  border-top: 2rpx solid #f0f0f0;
+  border-top: 1rpx solid #E4E7ED;
   flex-shrink: 0;
 }
 
-/* 图片预览条 */
 .image-preview-bar {
   display: flex;
   gap: 16rpx;
@@ -1145,7 +1254,7 @@ onUnmounted(() => {
   border-radius: 16rpx;
   overflow: hidden;
   flex-shrink: 0;
-  border: 2rpx solid #eee;
+  border: 1rpx solid #E4E7ED;
 
   .preview-img {
     width: 100%;
@@ -1169,7 +1278,6 @@ onUnmounted(() => {
   }
 }
 
-/* 输入行 */
 .input-row {
   display: flex;
   align-items: center;
@@ -1177,7 +1285,6 @@ onUnmounted(() => {
   position: relative;
 }
 
-/* 📷 拍照操作菜单 */
 .overlay {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
@@ -1189,7 +1296,7 @@ onUnmounted(() => {
 
 .action-sheet {
   width: 100%;
-  background: #fff;
+  background: #FFFFFF;
   border-radius: 24rpx 24rpx 0 0;
   padding-bottom: calc(env(safe-area-inset-bottom) + 16rpx);
   overflow: hidden;
@@ -1199,22 +1306,22 @@ onUnmounted(() => {
   padding: 36rpx 0;
   text-align: center;
   font-size: 32rpx;
-  color: #333;
-  border-bottom: 1rpx solid #f0f0f0;
+  color: #303133;
+  border-bottom: 1rpx solid #E4E7ED;
   transition: background 0.15s;
 
-  &:active { background: #f5f5f5 }
+  &:active { background: #F5F7FA }
 }
 
 .action-cancel {
   padding: 28rpx 0;
   text-align: center;
   font-size: 30rpx;
-  color: #999;
-  border-top: 10rpx solid #f5f5f5;
+  color: #909399;
+  border-top: 10rpx solid #F5F7FA;
   transition: background 0.15s;
 
-  &:active { background: #f5f5f5 }
+  &:active { background: #F5F7FA }
 }
 
 .voice-input-area {
@@ -1222,15 +1329,15 @@ onUnmounted(() => {
   align-items: center;
   gap: 16rpx;
   padding: 20rpx 24rpx;
-  border-top: 2rpx solid #f0f0f0;
+  border-top: 1rpx solid #E4E7ED;
   flex-shrink: 0;
 }
 
 .voice-hold-btn {
   flex: 1;
-  height: 80rpx;
-  background: linear-gradient(135deg, #c4a45a 0%, #9a7630 100%);
-  border-radius: 40rpx;
+  min-height: 88rpx;
+  background: #F5F7FA;
+  border-radius: 44rpx;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1239,18 +1346,22 @@ onUnmounted(() => {
   -webkit-user-select: none;
 
   text {
-    font-size: 26rpx;
-    color: #fff;
+    font-size: 28rpx;
+    color: #303133;
     font-family: $font-body;
     letter-spacing: 4rpx;
     white-space: nowrap;
   }
-  
+
   &.recording {
-    background: linear-gradient(135deg, #ff4d4f 0%, #ff7875 100%);
+    background: #ff4d4f;
     transform: scale(0.97);
+
+    text {
+      color: #fff;
+    }
   }
-  
+
   &:active {
     transform: scale(0.97);
   }
@@ -1258,13 +1369,14 @@ onUnmounted(() => {
 
 .chat-input {
   flex: 1;
-  height: 80rpx;
-  background: #f5f5f5;
-  border-radius: 40rpx;
+  height: 88rpx;
+  background: #F5F7FA;
+  border-radius: 44rpx;
   padding: 0 32rpx;
   font-size: 28rpx;
   font-family: $font-body;
-  line-height: 1.4;
+  line-height: 1.5;
+  color: #303133;
 }
 
 .input-actions {
@@ -1273,216 +1385,40 @@ onUnmounted(() => {
 }
 
 .action-icon-btn {
-  width: 72rpx;
-  height: 72rpx;
-  background: #f5f5f5;
+  width: 88rpx;
+  height: 88rpx;
+  min-width: 44px;
+  min-height: 44px;
+  background: #F5F7FA;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  
+
   text {
     font-size: 32rpx;
   }
 }
 
 .send-btn {
-  width: 80rpx;
-  height: 80rpx;
-  background: linear-gradient(135deg, #c4a45a 0%, #9a7630 100%);
+  width: 88rpx;
+  height: 88rpx;
+  min-width: 44px;
+  min-height: 44px;
+  background: #FFD700;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  
+
   text {
     font-size: 36rpx;
-    color: #fff;
+    color: #2b2b2b;
   }
-}
 
-.right-panel {
-  width: 320rpx;
-  background: #fff;
-  margin: 16rpx 16rpx 16rpx 0;
-  border-radius: 24rpx;
-  overflow: hidden;
-  box-shadow: 0 4rpx 24rpx rgba(0, 0, 0, 0.08);
-  display: flex;
-  flex-direction: column;
-  
-  @media screen and (max-width: 768px) {
-    display: none;
+  &:active {
+    transform: scale(0.95);
   }
-}
-
-.right-panel .panel-header {
-  padding: 24rpx;
-  border-bottom: 2rpx solid #f0f0f0;
-  
-  .panel-title {
-    font-size: 30rpx;
-  }
-}
-
-.quick-actions-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 16rpx;
-  padding: 20rpx;
-}
-
-.quick-action-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8rpx;
-}
-
-.action-icon-box {
-  width: 80rpx;
-  height: 80rpx;
-  border-radius: 20rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  
-  .icon {
-    font-size: 36rpx;
-  }
-  
-  &.location {
-    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-  }
-  
-  &.weather {
-    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-  }
-  
-  &.food {
-    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
-  }
-  
-  &.route {
-    background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);
-  }
-}
-
-.action-name {
-  font-size: 22rpx;
-  color: #666;
-}
-
-.section-divider {
-  padding: 16rpx 20rpx;
-  border-top: 2rpx solid #f0f0f0;
-}
-
-.section-divider .section-title {
-  font-size: 26rpx;
-  color: #333;
-}
-
-.hot-spots-list {
-  padding: 0 20rpx;
-}
-
-.hot-spot-item {
-  display: flex;
-  gap: 12rpx;
-  padding: 12rpx 0;
-  
-  &:not(:last-child) {
-    border-bottom: 2rpx solid #f5f5f5;
-  }
-}
-
-.spot-thumb {
-  width: 64rpx;
-  height: 64rpx;
-  border-radius: 12rpx;
-}
-
-.spot-info {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-.spot-name {
-  font-size: 26rpx;
-  color: #333;
-}
-
-.spot-tag {
-  font-size: 20rpx;
-  color: #999;
-}
-
-.recommendations-list {
-  padding: 12rpx 20rpx;
-}
-
-.recommendation-item {
-  display: flex;
-  gap: 12rpx;
-  padding: 12rpx 0;
-  
-  &:not(:last-child) {
-    border-bottom: 2rpx solid #f5f5f5;
-  }
-}
-
-.rec-icon {
-  font-size: 32rpx;
-}
-
-.rec-content {
-  flex: 1;
-}
-
-.rec-title {
-  display: block;
-  font-size: 24rpx;
-  color: #333;
-}
-
-.rec-desc {
-  font-size: 20rpx;
-  color: #999;
-}
-
-.banner-section {
-  position: relative;
-  margin: 16rpx;
-  border-radius: 16rpx;
-  overflow: hidden;
-}
-
-.banner-img {
-  width: 100%;
-  height: 160rpx;
-}
-
-.banner-overlay {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 16rpx;
-  background: linear-gradient(transparent, rgba(0, 0, 0, 0.6));
-}
-
-.banner-title {
-  display: block;
-  font-size: 26rpx;
-  color: #fff;
-}
-
-.banner-subtitle {
-  font-size: 20rpx;
-  color: rgba(255, 255, 255, 0.8);
 }
 
 /* ====== WebRTC 实时拍照取景器 ====== */

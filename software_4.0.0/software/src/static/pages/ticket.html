@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>景区购票 - 灵山胜境</title>
+<style>
+@import url("https://fontsapi.zeoseven.com/229/main/result.css");
+@import url("https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont/style.css");
+/* ========== 全局基础 ========== */
+* { margin:0; padding:0; box-sizing: border-box; }
+body {
+  font-family: "LXGW WenKai", "PingFang SC", "Microsoft YaHei", serif;
+  min-height: 100vh;
+  background: #f7f2e3;
+  color: #4a3a2a;
+  line-height: 1.6;
+}
+
+/* ========== 顶部导航栏 ========== */
+.nav-bar {
+  position: sticky; top:0; z-index:100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 24px;
+  background: rgba(255, 253, 245, 0.95);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(200, 185, 150, 0.15);
+}
+.nav-left, .nav-right { display: flex; align-items: center; gap: 8px; }
+.nav-title {
+  font-size: 18px; font-weight: 600; color: #4a3a2a;
+  letter-spacing: 2px;
+  font-family: "PangMenZhengDao-Cu6.0", "LXGW WenKai", serif;
+}
+.nav-btn {
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  background: rgba(200, 185, 150, 0.12);
+  border: none; color: rgba(74, 58, 42, 0.6);
+  font-size: 18px; cursor: pointer; transition: background 0.25s;
+}
+.nav-btn:hover { background: rgba(200, 185, 150, 0.25); }
+
+/* ========== 优惠通栏 ========== */
+.promo-banner {
+  max-width: 960px; margin: 12px auto 0; padding: 0 24px;
+}
+.promo-inner {
+  background: linear-gradient(135deg, rgba(230, 180, 140, 0.12), rgba(220, 160, 110, 0.06));
+  border: 1px solid rgba(210, 160, 110, 0.15);
+  border-radius: 10px; padding: 9px 18px;
+  display: flex; align-items: center; gap: 10px; overflow: hidden;
+}
+.promo-icon { font-size: 16px; flex-shrink: 0; }
+.promo-scroll {
+  flex: 1; overflow: hidden; white-space: nowrap; position: relative;
+}
+.promo-text {
+  display: inline-block;
+  font-size: 13px; color: rgba(180, 110, 75, 0.8);
+  letter-spacing: 0.5px;
+  animation: scrollText 18s linear infinite;
+  padding-left: 100%;
+}
+@keyframes scrollText {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-100%); }
+}
+
+/* ========== 页面主体容器 ========== */
+.ticket-container {
+  max-width: 960px; margin: 0 auto; padding: 14px 24px 60px;
+}
+
+/* ========== 购票卡片（左中右三栏） ========== */
+.ticket-card {
+  background: #fffdf8;
+  border-radius: 14px;
+  padding: 24px 28px 20px;
+  margin-bottom: 14px;
+  box-shadow: 0 2px 12px rgba(180, 165, 130, 0.08);
+  border: 1px solid rgba(200, 185, 150, 0.12);
+  display: flex; align-items: center; gap: 24px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+}
+.ticket-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 28px rgba(180, 165, 130, 0.16);
+}
+
+/* 左侧：价格区 */
+.card-price-area {
+  flex-shrink: 0; min-width: 120px; text-align: center;
+}
+.price-original {
+  font-size: 13px; color: rgba(180, 165, 130, 0.55);
+  text-decoration: line-through;
+  text-decoration-color: rgba(180, 165, 130, 0.4);
+}
+.price-now {
+  font-size: 34px; font-weight: 700;
+  color: rgba(200, 120, 85, 0.9);
+  line-height: 1.1;
+}
+.price-now.free {
+  font-size: 32px;
+}
+.price-unit {
+  font-size: 14px; font-weight: 500;
+  color: rgba(200, 120, 85, 0.6);
+}
+
+/* 中间：标题 + 说明 */
+.card-info-area { flex: 1; }
+.card-title {
+  font-size: 16px; font-weight: 600; color: #3a2e1e;
+  margin-bottom: 5px;
+}
+.card-desc {
+  font-size: 13px; color: rgba(74, 58, 42, 0.6);
+  line-height: 1.7;
+}
+
+/* 右侧：折扣标签 + 购票按钮 */
+.card-action-area {
+  flex-shrink: 0; display: flex; flex-direction: column;
+  align-items: flex-end; gap: 10px; min-width: 130px;
+}
+.discount-tag {
+  font-size: 12px; font-weight: 600; color: #fff;
+  background: rgba(200, 120, 85, 0.75);
+  padding: 4px 12px; border-radius: 8px;
+  letter-spacing: 0.5px; flex-shrink: 0;
+}
+.discount-tag.free-tag {
+  background: rgba(140, 160, 130, 0.7);
+}
+.stock-info {
+  font-size: 12px; color: rgba(120, 160, 120, 0.65);
+}
+.buy-btn {
+  padding: 8px 28px; border: none; border-radius: 22px;
+  font-size: 14px; font-weight: 600;
+  cursor: pointer;
+  font-family: "LXGW WenKai", "PingFang SC", serif;
+  letter-spacing: 1px; transition: all 0.25s ease;
+  background: rgba(200, 120, 85, 0.85); color: #fff;
+  box-shadow: 0 3px 12px rgba(200, 120, 85, 0.2);
+}
+.buy-btn:hover {
+  background: rgba(200, 120, 85, 0.95);
+  box-shadow: 0 4px 16px rgba(200, 120, 85, 0.3);
+  transform: translateY(-1px);
+}
+.buy-btn:active { transform: translateY(0); }
+.buy-btn.disabled {
+  background: rgba(180, 165, 130, 0.25);
+  color: rgba(74, 58, 42, 0.45);
+  cursor: default; box-shadow: none;
+}
+.buy-btn.disabled:hover { transform: none; box-shadow: none; }
+.buy-note {
+  font-size: 12px; color: rgba(180, 145, 55, 0.6);
+  text-align: right; margin-top: 4px;
+}
+
+/* ========== 购票须知 & 开放时间 ========== */
+.info-section {
+  background: rgba(245, 240, 228, 0.6);
+  border-radius: 14px; padding: 22px 28px;
+  margin-bottom: 14px;
+  border: 1px solid rgba(200, 185, 150, 0.1);
+}
+.info-section-title {
+  font-size: 15px; font-weight: 600; color: #4a3a2a;
+  margin-bottom: 10px; padding-left: 10px;
+  border-left: 3px solid rgba(200, 160, 60, 0.4);
+}
+.info-section-text {
+  font-size: 14px; color: rgba(74, 58, 42, 0.65); line-height: 1.8;
+}
+.info-section-text .time-item { display: block; padding: 3px 0; }
+.info-section-text .time-label {
+  font-weight: 600; color: rgba(74, 58, 42, 0.8);
+}
+
+/* ============================================================
+   购票二维码弹窗
+   ============================================================ */
+.qr-overlay {
+  display: none; position: fixed;
+  top:0; left:0; right:0; bottom:0;
+  z-index: 9999;
+  background: rgba(180, 165, 130, 0.45);
+  backdrop-filter: blur(6px);
+  align-items: center; justify-content: center;
+  animation: qrFadeIn 0.25s ease;
+}
+.qr-overlay.active { display: flex; }
+
+@keyframes qrFadeIn { from { opacity:0; } to { opacity:1; } }
+
+.qr-modal {
+  position: relative;
+  width: 400px; max-width: 92vw;
+  background: #fffdf8;
+  border-radius: 18px;
+  box-shadow: 0 16px 64px rgba(80, 60, 30, 0.28);
+  padding: 36px 32px 28px;
+  text-align: center;
+  animation: qrSlideUp 0.3s ease;
+}
+@keyframes qrSlideUp {
+  from { transform: translateY(24px); opacity:0; }
+  to   { transform: translateY(0);    opacity:1; }
+}
+
+/* 关闭按钮 */
+.qr-close {
+  position: absolute; top: 14px; left: 14px;
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: rgba(200, 185, 150, 0.12);
+  border: none; color: rgba(74, 58, 42, 0.5);
+  font-size: 16px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s; z-index: 2;
+}
+.qr-close:hover {
+  background: rgba(190, 110, 90, 0.1);
+  color: rgba(190, 110, 90, 0.8);
+}
+
+/* 弹窗标题 */
+.qr-title {
+  font-size: 18px; font-weight: 700; color: #3a2e1e;
+  margin-bottom: 6px;
+  font-family: "LXGW WenKai", "PingFang SC", serif;
+}
+
+/* 购票信息行 */
+.qr-ticket-info {
+  font-size: 14px; color: rgba(74, 58, 42, 0.65);
+  margin-bottom: 20px;
+  font-family: "LXGW WenKai", "PingFang SC", serif;
+}
+.qr-ticket-name { font-weight: 600; color: #4a3a2a; }
+.qr-ticket-price {
+  font-size: 22px; font-weight: 700;
+  color: rgba(200, 120, 85, 0.9);
+  margin-left: 6px;
+  font-family: "LXGW WenKai", "PingFang SC", serif;
+}
+
+/* 二维码占位图 */
+.qr-code-area {
+  width: 200px; height: 200px;
+  margin: 0 auto 16px;
+  border-radius: 12px;
+  background: #fff;
+  border: 1px solid rgba(200, 185, 150, 0.2);
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+.qr-code-area img {
+  width: 100%; height: 100%; object-fit: contain; display: block;
+}
+/* 占位装饰（未放入真实二维码时使用） */
+.qr-placeholder {
+  width: 160px; height: 160px;
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  grid-template-rows: repeat(8, 1fr);
+  gap: 2px;
+  padding: 10px;
+}
+.qr-block {
+  border-radius: 2px;
+  background: rgba(74, 58, 42, 0.7);
+}
+.qr-block.white { background: transparent; }
+.qr-center-logo {
+  position: absolute;
+  width: 44px; height: 44px;
+  background: #fff; border-radius: 8px;
+  left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; font-weight: 700;
+  color: #4a3a2a;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* 说明文字 */
+.qr-desc {
+  font-size: 13px; color: rgba(74, 58, 42, 0.6);
+  line-height: 1.7; margin-bottom: 12px;
+  font-family: "LXGW WenKai", "PingFang SC", serif;
+}
+
+/* 底部小字提示 */
+.qr-tip {
+  font-size: 12px; color: rgba(180, 145, 55, 0.5);
+  font-family: "LXGW WenKai", "PingFang SC", serif;
+}
+</style>
+</head>
+<body>
+
+<!-- ====== 顶部导航栏 ====== -->
+<div class="nav-bar">
+  <div class="nav-left">
+    <button class="nav-btn" onclick="history.back()">‹</button>
+  </div>
+  <div class="nav-title">🎫 景区购票</div>
+  <div class="nav-right">
+    <button class="nav-btn" onclick="history.back()">✕</button>
+  </div>
+</div>
+
+<!-- ====== 优惠通栏 ====== -->
+<div class="promo-banner">
+  <div class="promo-inner">
+    <span class="promo-icon">🎊</span>
+    <div class="promo-scroll">
+      <span class="promo-text">
+        限时线上专享折扣，线上购票立减，线下无优惠｜
+        成人票线上9折 ￥210（原价￥240）｜
+        优待票线上8.8折 ￥105（原价￥120）｜
+        年票限时直降100元 ￥580（原价￥680）｜
+        儿童免票无门槛
+      </span>
+    </div>
+  </div>
+</div>
+
+<!-- ====== 购票主体 ====== -->
+<div class="ticket-container">
+
+  <!-- 成人票 -->
+  <div class="ticket-card">
+    <div class="card-price-area">
+      <div class="price-original">￥240</div>
+      <div class="price-now">￥210<span class="price-unit">/人</span></div>
+    </div>
+    <div class="card-info-area">
+      <div class="card-title">成人票</div>
+      <div class="card-desc">含灵山胜境大门票，可游览灵山大佛、梵宫、五印坛城等全部景点</div>
+    </div>
+    <div class="card-action-area">
+      <div class="discount-tag">线上9折</div>
+      <span class="stock-info">库存充足</span>
+      <button class="buy-btn" onclick="openQrModal('成人票', '￥210')">立即购票</button>
+    </div>
+  </div>
+
+  <!-- 优待票 -->
+  <div class="ticket-card">
+    <div class="card-price-area">
+      <div class="price-original">￥120</div>
+      <div class="price-now">￥105<span class="price-unit">/人</span></div>
+    </div>
+    <div class="card-info-area">
+      <div class="card-title">优待票</div>
+      <div class="card-desc">60周岁以上老人凭身份证、全日制学生凭学生证、身高1.2米以上未成年人</div>
+    </div>
+    <div class="card-action-area">
+      <div class="discount-tag">线上8.8折</div>
+      <button class="buy-btn" onclick="openQrModal('优待票', '￥105')">立即购票</button>
+    </div>
+  </div>
+
+  <!-- 儿童免票 -->
+  <div class="ticket-card">
+    <div class="card-price-area">
+      <div class="price-now free">免费</div>
+    </div>
+    <div class="card-info-area">
+      <div class="card-title">儿童票</div>
+      <div class="card-desc">身高1.2米以下儿童免票；1.2米以上按优待票执行</div>
+    </div>
+    <div class="card-action-area">
+      <div class="discount-tag free-tag">无门槛免票</div>
+      <button class="buy-btn disabled" disabled>无需购票</button>
+    </div>
+  </div>
+
+  <!-- 年票 -->
+  <div class="ticket-card">
+    <div class="card-price-area">
+      <div class="price-original">￥680</div>
+      <div class="price-now">￥580<span class="price-unit">/年</span></div>
+    </div>
+    <div class="card-info-area">
+      <div class="card-title">年票</div>
+      <div class="card-desc">灵山胜境全年不限次入园，含九龙灌浴演出观看权</div>
+    </div>
+    <div class="card-action-area">
+      <div class="discount-tag">限时直降100元</div>
+      <button class="buy-btn" onclick="openQrModal('年票', '￥580')">立即购票</button>
+      <div class="buy-note">线上专属优惠，线下无降价</div>
+    </div>
+  </div>
+
+  <!-- 购票须知 -->
+  <div class="info-section">
+    <div class="info-section-title">购票须知</div>
+    <div class="info-section-text">
+      ① 建议通过线上官方渠道购票，电子票扫码入园；<br>
+      ② 门票当日单次有效，出园后再次入园需重新购票；<br>
+      ③ 优待票入园需携带对应证件，门票售出后不可退改。
+    </div>
+  </div>
+
+  <!-- 开放时间 -->
+  <div class="info-section">
+    <div class="info-section-title">开放时间</div>
+    <div class="info-section-text">
+      <span class="time-item"><span class="time-label">旺季（3月—10月）</span>　07:30 — 17:30</span>
+      <span class="time-item"><span class="time-label">淡季（11月—次年2月）</span>　08:00 — 17:00</span>
+      <span class="time-item">九龙灌浴每日循环演出，持票可免费观看</span>
+    </div>
+  </div>
+
+</div>
+
+<!-- ============================================================
+     购票二维码弹窗（浮层，不跳转页面）
+     ============================================================ -->
+<div class="qr-overlay" id="qrOverlay">
+  <div class="qr-modal" onclick="event.stopPropagation()">
+    <!-- 关闭按钮 -->
+    <button class="qr-close" onclick="closeQrModal()">✕</button>
+
+    <!-- 标题 -->
+    <div class="qr-title">线上扫码支付</div>
+
+    <!-- 购票信息 -->
+    <div class="qr-ticket-info">
+      <span class="qr-ticket-name" id="qrTicketName"></span>
+      <span class="qr-ticket-price" id="qrTicketPrice"></span>
+    </div>
+
+    <!-- 二维码占位区域 -->
+    <div class="qr-code-area" id="qrCodeArea">
+      <!--
+        实际使用时：
+        1. 将真实收款二维码图片放入 static/qr/ 目录
+        2. 取消下面 img 的注释，并设置正确 src 路径
+        <img src="/static/qr/wxpay-qr.png" alt="扫码支付">
+      -->
+      <div class="qr-placeholder" id="qrPlaceholder"></div>
+      <div class="qr-center-logo">支</div>
+    </div>
+
+    <!-- 说明文字 -->
+    <div class="qr-desc">
+      微信 / 支付宝扫码完成付款<br>
+      支付成功后自动生成电子门票
+    </div>
+
+    <!-- 底部提示 -->
+    <div class="qr-tip">支付完成无需刷新页面，自动显示电子票</div>
+  </div>
+</div>
+
+<script>
+/* ========== 打开二维码弹窗 ========== */
+function openQrModal(ticketName, ticketPrice) {
+  document.getElementById('qrTicketName').textContent = ticketName;
+  document.getElementById('qrTicketPrice').textContent = ticketPrice;
+  document.getElementById('qrOverlay').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+/* ========== 关闭二维码弹窗 ========== */
+function closeQrModal() {
+  document.getElementById('qrOverlay').classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+/* ========== 点击遮罩关闭弹窗 ========== */
+document.getElementById('qrOverlay').addEventListener('click', function(e) {
+  if (e.target === this) {
+    closeQrModal();
+  }
+});
+
+/* ========== ESC 键关闭弹窗 ========== */
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    var overlay = document.getElementById('qrOverlay');
+    if (overlay.classList.contains('active')) {
+      closeQrModal();
+    }
+  }
+});
+
+/* ========== 生成二维码占位图（模拟二维码视觉） ========== */
+(function generateQrPlaceholder() {
+  var el = document.getElementById('qrPlaceholder');
+  if (!el) return;
+  var html = '';
+  // 生成 8x8 模拟二维码像素块
+  var pattern = [
+    [1,1,1,0,0,1,1,1],
+    [1,0,1,0,0,1,0,1],
+    [1,1,1,0,0,1,1,1],
+    [0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0],
+    [1,1,0,1,1,0,1,1],
+    [0,1,0,1,1,0,1,0],
+    [1,1,0,0,0,0,1,1]
+  ];
+  for (var r = 0; r < 8; r++) {
+    for (var c = 0; c < 8; c++) {
+      html += '<div class="qr-block' + (pattern[r][c] ? '' : ' white') + '"></div>';
+    }
+  }
+  el.innerHTML = html;
+})();
+</script>
+
+</body>
+</html>

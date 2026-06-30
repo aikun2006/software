@@ -10,7 +10,7 @@
 
       <!-- 返回按钮 -->
       <view class="back-btn" @click="goBack">
-        <image class="back-icon-img" src="/static/icons/mountain-gate-icon.png" mode="aspectFit" />
+        <text class="back-icon-img">‹</text>
       </view>
 
       <!-- 搜索按钮（放大镜） -->
@@ -490,8 +490,10 @@ $font-size-mini: 20rpx;
   }
 
   .back-icon-img {
-    width: 44rpx;
-    height: 44rpx;
+    font-size: 48rpx;
+    color: #fff;
+    line-height: 44rpx;
+    font-weight: 300;
   }
 }
 

@@ -17,7 +17,7 @@
     <!-- ============ 左侧：数字人区域（原有代码完整保留，仅位置移至左侧） ============ -->
     <view class="avatar-area" @click="onAvatarClick">
       <view class="avatar-glow"></view>
-      <SimpleAvatar2D ref="avatarRef" :show-controls="false" :show-name="false" class="enlarged-avatar" />
+      <Avatar3D ref="avatarRef" :show-name="false" class="enlarged-avatar" />
       <view class="click-hint" :class="{ pulse: showHint }">
         <text class="hint-text">点击开始导览</text>
         <view class="hint-arrow">
@@ -110,7 +110,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
 import { onShow, onHide } from '@dcloudio/uni-app'
-import SimpleAvatar2D from '@/components/SimpleAvatar2D.vue'
+import Avatar3D from '@/components/Avatar3D.vue'
 
 const avatarRef = ref()
 const showHint = ref(true)
@@ -555,14 +555,27 @@ onUnmounted(() => {
   /* —— 新增：左侧定位 —— */
   flex-shrink: 0;
   width: 38%;
+  /* 放大2倍后通过裁剪将数字人及背景画布限制在面板边界内（约束1允许的裁剪方式）。
+     面板自身尺寸/位置/布局结构均保持不变。 */
+  overflow: hidden;
 }
 
 .avatar-glow {
   position: absolute;
-  width: 500rpx;
-  height: 500rpx;
+  /* 居中于 .avatar-area：inset:0 + margin:auto 对固定宽高的 absolute 元素可实现完美居中，
+     且不依赖 transform，避免与 glowPulse 动画的 scale 冲突 */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  /* 容器背景框：宽度+高度统一为黄色侧边栏内部区域的 2/3 尺寸，居中显示 */
+  width: 66.67%;
+  height: 66.67%;
+  /* border-radius:50% 在非正方形下自动呈椭圆，纵向更长 */
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(167,139,250,0.3) 0%, rgba(167,139,250,0.1) 40%, transparent 70%);
+  /* 渐变改为 ellipse 以匹配纵向拉长的画布形状，避免圆形渐变与椭圆容器不协调导致变形感 */
+  background: radial-gradient(ellipse, rgba(167,139,250,0.3) 0%, rgba(167,139,250,0.1) 40%, transparent 70%);
   animation: glowPulse 4s ease-in-out infinite;
   pointer-events: none;
 }
@@ -571,15 +584,24 @@ onUnmounted(() => {
   50% { transform: scale(1.15); opacity: 1; }
 }
 
-/* 放大数字人 */
+/* 数字人容器：人物整体高度精确占据黄色侧边栏中间 1/2 的垂直空间。
+   width/height 用百分比让 Avatar3D canvas 填满分配区域，
+   模型大小由 Three.js computeFitDistance 自动适配到容器内，等比例不变形。
+   不使用 CSS scale，避免视觉高度超出容器被裁剪，破坏 1/2 精确约束。 */
 .enlarged-avatar {
-  transform: scale(1.8);
-  transform-origin: center center;
+  position: relative;
+  z-index: 2;
+  width: 66.67%;          /* 与 .avatar-glow 宽度一致，水平居中由父级 flex 控制 */
+  height: 50%;            /* 人物整体高度精确占黄色栏中间 1/2 空间 */
 }
 
-/* 点击提示 */
+/* 点击提示：改为绝对定位到底部，不占用 flex 空间，
+   这样 Avatar3D 能真正在 .avatar-area 垂直中心，与光晕框对齐 */
 .click-hint {
-  margin-top: 80rpx;
+  position: absolute;
+  bottom: 40rpx;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -590,8 +612,9 @@ onUnmounted(() => {
   animation: hintPulse 2.5s ease-in-out infinite;
 }
 @keyframes hintPulse {
-  0%, 100% { opacity: 0.5; transform: translateY(0); }
-  50% { opacity: 1; transform: translateY(-8rpx); }
+  /* translateX(-50%) 必须合并进动画，否则 pulse 时水平居中会失效 */
+  0%, 100% { opacity: 0.5; transform: translateX(-50%) translateY(0); }
+  50% { opacity: 1; transform: translateX(-50%) translateY(-8rpx); }
 }
 
 .hint-text {

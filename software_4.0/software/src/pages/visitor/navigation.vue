@@ -56,7 +56,7 @@
     <!-- 顶部导航栏：毛玻璃 -->
     <view class="nav-topbar">
       <view class="topbar-back" @click="goBack">
-        <image class="back-arrow-img" src="/static/icons/mountain-gate-icon.png" mode="aspectFit" />
+        <text class="back-arrow-img">‹</text>
       </view>
       <text class="topbar-title">{{ destName || '目的地' }}</text>
       <view class="topbar-gps" @click="toggleGps">
@@ -420,7 +420,7 @@ onUnmounted(() => { if (simInterval) clearInterval(simInterval) })
     filter: brightness(1.25) saturate(1.3);
   }
 }
-.back-arrow-img { width: 36rpx; height: 36rpx; }
+.back-arrow-img { font-size: 40rpx; color: #333; line-height: 40rpx; font-weight: 300; }
 .topbar-title {
   flex: 1; text-align: center; font-size: 32rpx; font-weight: 600;
   color: #333; letter-spacing: 2rpx;
