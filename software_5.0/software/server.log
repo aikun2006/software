@@ -1,0 +1,56 @@
+灵山导览服务器: http://localhost:8080
+访问口令: lingshan2026（环境变量 LINGSHAN_PASS 可覆盖）
+文本AI: 智谱 GLM-4-Flash
+多模态: 智谱 GLM-4V-Flash
+TTS语音: 微软晓晓 (zh-CN-XiaoxiaoNeural)
+游客用户: SQLite (lingshan_users.db)
+[02/Jul/2026 18:05:03] "GET / HTTP/1.1" 200 -
+[02/Jul/2026 18:05:03] "GET /favicon.ico HTTP/1.1" 200 -
+[02/Jul/2026 18:05:08] "POST /api/login HTTP/1.1" 200 -
+登录成功，已签发会话。
+[02/Jul/2026 18:05:09] "GET / HTTP/1.1" 200 -
+[02/Jul/2026 18:05:09] "GET /assets/uni.beac2b8d.css HTTP/1.1" 200 -
+[02/Jul/2026 18:05:09] "GET /assets/index-CMpfE8_t.css HTTP/1.1" 200 -
+[02/Jul/2026 18:05:09] "GET /assets/index-BKcPzMeP.js HTTP/1.1" 200 -
+[02/Jul/2026 18:05:09] "GET /assets/index-Ctb7r4Jx.css HTTP/1.1" 200 -
+[02/Jul/2026 18:05:09] "GET /assets/Avatar3D-DmzdOwH7.css HTTP/1.1" 200 -
+[02/Jul/2026 18:05:09] "GET /assets/Avatar3D.C8uGcDAt.js HTTP/1.1" 200 -
+[02/Jul/2026 18:05:09] "GET /assets/pages-visitor-index.Cf6BfxZX.js HTTP/1.1" 200 -
+[02/Jul/2026 18:05:09] "POST /api/user/info HTTP/1.1" 200 -
+[02/Jul/2026 18:05:09] "GET /assets/_plugin-vue_export-helper.BCo6x5W8.js HTTP/1.1" 200 -
+[02/Jul/2026 18:05:10] "GET /static/avatars/guide.vrm HTTP/1.1" 200 -
+[02/Jul/2026 18:05:10] "GET /static/icons/tab-home.jpg HTTP/1.1" 200 -
+[02/Jul/2026 18:05:10] "GET /static/icons/tab-chat.jpg HTTP/1.1" 200 -
+[02/Jul/2026 18:05:10] "GET /static/spots/fangong-square.jpg HTTP/1.1" 200 -
+[02/Jul/2026 18:05:10] "GET /static/spots/lingshan-dafo.jpg HTTP/1.1" 200 -
+[02/Jul/2026 18:05:10] "GET /static/spots/wuyin-tancheng.jpg HTTP/1.1" 200 -
+[02/Jul/2026 18:05:10] "GET /static/spots/lingshan-fangong.jpg HTTP/1.1" 200 -
+[02/Jul/2026 18:05:10] "GET /static/spots/lingshan-jingshe.jpg HTTP/1.1" 200 -
+[02/Jul/2026 18:05:10] "GET /static/spots/baizi-mile.jpg HTTP/1.1" 200 -
+[02/Jul/2026 18:05:10] "GET /static/spots/manfeilong-ta.jpg HTTP/1.1" 200 -
+[02/Jul/2026 18:05:10] "GET /static/spots/xiangfu-temple.jpg HTTP/1.1" 200 -
+[02/Jul/2026 18:05:10] "GET /static/spots/jiulong-guanyu.jpg HTTP/1.1" 200 -
+[02/Jul/2026 18:05:10] "GET /static/spots/fozu-tan.jpg HTTP/1.1" 200 -
+[02/Jul/2026 18:05:11] "GET /static/icons/home.png HTTP/1.1" 200 -
+[02/Jul/2026 18:05:12] "GET /static/prompt.mp3 HTTP/1.1" 200 -
+[02/Jul/2026 18:05:13] "GET /static/icons/home.png HTTP/1.1" 200 -
+[02/Jul/2026 18:05:17] "GET /assets/pages-visitor-spots.DZn-wm40.js HTTP/1.1" 200 -
+[02/Jul/2026 18:05:17] "GET /assets/spots-hrCgaWok.css HTTP/1.1" 200 -
+[02/Jul/2026 18:05:17] "GET /assets/spots.-BSSEO66.js HTTP/1.1" 200 -
+[02/Jul/2026 18:05:17] "GET /static/icons/home.png HTTP/1.1" 200 -
+[02/Jul/2026 18:05:19] "GET /assets/mock.BmPWBp_u.js HTTP/1.1" 200 -
+[02/Jul/2026 18:05:19] "GET /assets/pages-visitor-chat.BccrdvwD.js HTTP/1.1" 200 -
+[02/Jul/2026 18:05:19] "GET /assets/chat-CZ3kzBqD.css HTTP/1.1" 200 -
+[02/Jul/2026 18:05:19] "GET /static/icons/home.png HTTP/1.1" 200 -
+[02/Jul/2026 18:05:19] "GET /static/avatars/guide.vrm HTTP/1.1" 200 -
+[02/Jul/2026 18:05:20] "GET /assets/pages-visitor-location.L8B7nWYy.js HTTP/1.1" 200 -
+[02/Jul/2026 18:05:20] "GET /assets/location-Cx1wu_AK.css HTTP/1.1" 200 -
+[02/Jul/2026 18:05:20] "GET /assets/lingshan-map.B6xJ23jo.js HTTP/1.1" 200 -
+[02/Jul/2026 18:05:20] "GET /static/icons/home.png HTTP/1.1" 200 -
+[02/Jul/2026 18:05:20] "GET /static/lingshan-map.jpg HTTP/1.1" 200 -
+[02/Jul/2026 18:05:26] "GET /assets/pages-visitor-profile.D5gacl6n.js HTTP/1.1" 200 -
+[02/Jul/2026 18:05:26] "GET /assets/profile-DfHoT5Oi.css HTTP/1.1" 200 -
+[02/Jul/2026 18:05:26] "GET /static/icons/home.png HTTP/1.1" 200 -
+[02/Jul/2026 18:05:29] "POST /api/user/logout HTTP/1.1" 200 -
+[02/Jul/2026 18:07:01] "POST /api/shutdown HTTP/1.1" 200 -
+收到关闭请求，服务器退出。
