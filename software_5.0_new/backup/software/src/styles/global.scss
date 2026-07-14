@@ -1,0 +1,564 @@
+// ===== Web Font CDN 引入 =====
+@import url("https://fontsapi.zeoseven.com/259/main/result.css");
+@import url("https://fontsapi.zeoseven.com/229/main/result.css");
+@import url("https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont/style.css");
+
+page {
+  background-color: $bg-color;
+  font-family: $font-body;
+  font-size: $font-size-base;
+  color: $text-primary;
+  line-height: 1.4;
+  box-sizing: border-box;
+}
+
+view, text, image {
+  box-sizing: border-box;
+}
+
+.container {
+  min-height: 100vh;
+  padding-bottom: 120rpx;
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.flex-1 {
+  flex: 1;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-primary {
+  color: $primary-color;
+}
+
+.text-secondary {
+  color: $text-secondary;
+}
+
+.text-light {
+  color: $text-light;
+}
+
+.font-bold {
+}
+
+.mt-sm {
+  margin-top: $spacing-sm;
+}
+
+.mt-base {
+  margin-top: $spacing-base;
+}
+
+.mt-lg {
+  margin-top: $spacing-lg;
+}
+
+.mb-sm {
+  margin-bottom: $spacing-sm;
+}
+
+.mb-base {
+  margin-bottom: $spacing-base;
+}
+
+.mb-lg {
+  margin-bottom: $spacing-lg;
+}
+
+.p-sm {
+  padding: $spacing-sm;
+}
+
+.p-base {
+  padding: $spacing-base;
+}
+
+.p-lg {
+  padding: $spacing-lg;
+}
+
+.card {
+  background: $bg-white;
+  border-radius: $border-radius-lg;
+  box-shadow: $shadow-sm;
+  padding: $spacing-base;
+  margin-bottom: $spacing-base;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-sm $spacing-lg;
+  border-radius: $border-radius;
+  font-size: $font-size-base;
+  transition: $transition-base;
+  border: none;
+  
+  &-primary {
+    background: $primary-color;
+    color: #fff;
+    
+    &:active {
+      background: $primary-dark;
+    }
+  }
+  
+  &-secondary {
+    background: $bg-gray;
+    color: $text-primary;
+    
+    &:active {
+      background: $border-color;
+    }
+  }
+  
+  &-outline {
+    background: transparent;
+    border: 2rpx solid $primary-color;
+    color: $primary-color;
+    
+    &:active {
+      background: $primary-light;
+    }
+  }
+  
+  &-block {
+    width: 100%;
+  }
+  
+  &-lg {
+    padding: $spacing-base $spacing-xl;
+    font-size: $font-size-lg;
+  }
+  
+  &-sm {
+    padding: $spacing-xs $spacing-base;
+    font-size: $font-size-sm;
+  }
+}
+
+.input {
+  width: 100%;
+  padding: $spacing-base;
+  border: 2rpx solid $border-color;
+  border-radius: $border-radius;
+  font-size: $font-size-base;
+  background: $bg-white;
+  
+  &:focus {
+    border-color: $primary-color;
+  }
+  
+  &-placeholder {
+    color: $text-placeholder;
+  }
+}
+
+.ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ellipsis-2 {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+// ===== 底部导航栏增强样式（v5 精确路由版） =====
+
+// ── 1. 统一图标尺寸：强制5个图标完全等大 ──
+.uni-tabbar__icon,
+.uni-tabbar__icon.uni-tabbar__icon__diff {
+  width: 24px !important;
+  height: 24px !important;
+  margin: 0 !important;
+  padding: 5px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-sizing: content-box !important;
+  transition: transform 0.25s ease-in-out;
+  transform-origin: center center;
+}
+
+.uni-tabbar__icon img {
+  width: 24px !important;
+  height: 24px !important;
+  object-fit: contain !important;
+  display: block !important;
+  filter: contrast(1.08) saturate(1.04);
+}
+
+// ── 2. 导航项 + bd 容器：过渡 + 圆角 + 定位上下文 ──
+.uni-tabbar__item {
+  transition: background-color 0.25s ease-in-out;
+  border-radius: 14px;
+}
+
+.uni-tabbar__bd {
+  position: relative;
+  transition: background-color 0.25s ease-in-out;
+  border-radius: 14px;
+  padding: 0 16px;
+}
+
+.uni-tabbar__label {
+  transition: color 0.25s ease-in-out !important;
+}
+
+// ── 3. 蓝色竖线：粗细适中3px、色调#1a6fe8、居中 ──
+.uni-tabbar__bd::before,
+.uni-tabbar__bd::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 0;
+  background: linear-gradient(to bottom, transparent 0%, #1a6fe8 8%, #1a6fe8 92%, transparent 100%);
+  border-radius: 1.5px;
+  transition: height 0.25s ease-in-out,
+              opacity 0.25s ease-in-out,
+              width 0.25s ease-in-out;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.uni-tabbar__bd::before {
+  left: 2px;
+}
+
+.uni-tabbar__bd::after {
+  right: 2px;
+}
+
+// ── 4. 激活态常驻（精确路由匹配）：POV放大 + 蓝色竖线 + 蓝色文字 + 浅蓝背景 ──
+.uni-tabbar__item.tab-active .uni-tabbar__icon {
+  transform: scale(1.2) perspective(120px) rotateX(6deg);
+}
+
+.uni-tabbar__item.tab-active .uni-tabbar__bd::before,
+.uni-tabbar__item.tab-active .uni-tabbar__bd::after {
+  height: 34px;
+  opacity: 1;
+}
+
+.uni-tabbar__item.tab-active .uni-tabbar__label {
+  color: #1a6fe8 !important;
+}
+
+.uni-tabbar__item.tab-active .uni-tabbar__bd {
+  background-color: rgba(26, 111, 232, 0.09);
+}
+
+// ── 5. 悬浮未激活项：短暂高亮，移开复原 ──
+.uni-tabbar__item:hover:not(.tab-active) .uni-tabbar__icon {
+  transform: scale(1.08) perspective(120px) rotateX(3deg);
+}
+
+.uni-tabbar__item:hover:not(.tab-active) .uni-tabbar__bd {
+  background-color: rgba(26, 111, 232, 0.05);
+}
+
+// ===== 全局页面切换动画（流式滑动 0.4s ease-out） =====
+
+.uni-page {
+  animation: page-enter 0.4s ease-out;
+  animation-delay: 0.05s;
+  animation-fill-mode: both;
+}
+
+.uni-page.page-leave {
+  animation: page-leave 0.4s ease-out forwards !important;
+  animation-delay: 0s !important;
+}
+
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes page-leave {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+}
+
+// ====================================================================== //
+// ====== 全局大字版模式样式（仅大字模式激活生效，不改动任何布局） ====== //
+// ====================================================================== //
+
+body.large-font-mode {
+
+  // ═══════════════════════════════════════════════════════════════ //
+  // ────────── 一、全站按钮统一放大20%（容器排版不变）────────── //
+  // ═══════════════════════════════════════════════════════════════ //
+  button, .btn, .login-btn, .submit-btn, .confirm-btn, .cancel-btn,
+  .action-btn, .send-btn, .nav-btn, .function-btn, .common-btn,
+  .carousel-arrow, .swiper-arrow, .prev-btn, .next-btn {
+    width: calc(100% * 1.2) !important;
+    height: calc(100% * 1.2) !important;
+  }
+
+  // ═══════════════════════════════════════════════════════════════ //
+  // ────────── 二、全局文字统一标准（全站字号增量完全统一）────────── //
+  // ═══════════════════════════════════════════════════════════════ //
+
+  // 全局文字统一加粗
+  text, view, span, div, p, label, button, input, textarea,
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: bold !important;
+  }
+
+  // 页面大标题、景点名称、板块标题、票种标题：+8px
+  .page-title, .nav-title, .spot-name, .spot-title, .section-title,
+  .carousel-spot-name, .modal-title, .panel-title, .card-title,
+  .food-name, .hotel-name, .detail-title, .page-header-title,
+  .ticket-title, .season-title,
+  .auth-title, .title-text, .header-title, .detail-spot-name,
+  .route-name, .topbar-title, .bar-title {
+    font-size: calc(1em + 8px) !important;
+    font-weight: bold !important;
+  }
+
+  // 正文、须知、贴士、表单提示文字：+7px，行高增加12%
+  .spot-desc, .spot-detail-desc, .carousel-spot-desc, .detail-text,
+  .modal-body, .notice-text, .tip-text, .description, .content-text,
+  .qa-question, .qa-answer, .chat-message, .message-text,
+  .food-desc, .hotel-desc, .review-content, .info-text,
+  .form-label, .input-label, label, .login-label, .register-label,
+  .auth-sub, .switch-link, .guest-name, .guest-tip, .user-name,
+  .info-label, .info-value, .legend-label, .legend-name, .detail-desc,
+  .section-label, .section-value, .section-text, .route-desc,
+  .detail-meta-value, .selector-title, .bar-instruction, .bar-sub,
+  .bar-step-action, .bar-step-dist, .degrade-hint, .ps-name,
+  .message-bubble, .message-time, .panel-title, .btn-text {
+    font-size: calc(1em + 7px) !important;
+    font-weight: bold !important;
+    line-height: 1.82 !important;
+  }
+
+  // 输入框文字：+7px
+  input, textarea, .input, .uni-input-input, .uni-textarea-textarea {
+    font-size: calc(1em + 7px) !important;
+    font-weight: bold !important;
+  }
+
+  // 所有按钮内文字、底部导航文字：+8px
+  button, .btn, .login-btn, .submit-btn, .confirm-btn, .cancel-btn,
+  .action-btn, .send-btn, .nav-btn, .app-btn-label,
+  .uni-tabbar__label, .btn-primary, .btn-outline, .btn-logout,
+  .nav-text, .recommend-btn, .route-action, .detail-meta-item {
+    font-size: calc(1em + 8px) !important;
+    font-weight: bold !important;
+  }
+
+  // 数字、价格、时长：+8px
+  .price, .distance, .duration, .temperature, .number-text,
+  .stat-number, .count, .value-text, .app-btn-value,
+  .meta-item, .review-date, .review-name, .meta-value,
+  .detail-meta-icon, .meta-icon {
+    font-size: calc(1em + 8px) !important;
+    font-weight: bold !important;
+  }
+
+  // 标签小字、轮播备注小字：+6px
+  .tag, .badge, .category-tag, .label-tag, .status-tag,
+  .type-tag, .filter-tag, .hint-text, .tip-small, .note-small,
+  .aux-text, .sub-text, .carousel-dots-text, .footer-text, .small-text,
+  .spot-tag, .spot-arrow, .search-icon, .search-clear, .ph,
+  .empty-tip, .back-icon, .legend-line, .detail-tag, .interest-item,
+  .spot-order, .spot-more, .close-btn, .cover-wrap, .loading-text,
+  .typing-cursor, .suggest-pill, .voice-btn, .map-btn-text,
+  .toggle-label, .connection-status, .status-dot, .avatar-label,
+  .btn-icon, .header-subtitle, .qa-q-icon, .qa-a-icon, .qa-q-text,
+  .qa-a-text, .qa-arrow, .review-avatar, .review-stars, .star,
+  .review-del, .empty-reviews, .fab-icon, .fab-label, .ps-idx {
+    font-size: calc(1em + 6px) !important;
+    font-weight: bold !important;
+  }
+
+  // ═══════════════════════════════════════════════════════════════ //
+  // ────────── 三、首页专属适配（和全局规则保持一致）────────── //
+  // ═══════════════════════════════════════════════════════════════ //
+
+  // 数字人提示文字「点击数字导览」：+8px
+  .hint-text {
+    font-size: calc(1em + 8px) !important;
+    font-weight: bold !important;
+  }
+
+  // 四大功能按钮放大20%
+  .app-btn {
+    width: calc(100% * 1.2) !important;
+    height: calc(100% * 1.2) !important;
+  }
+
+  // 四大功能按钮下方文字：+8px
+  .app-btn-label {
+    font-size: calc(1em + 8px) !important;
+    font-weight: bold !important;
+  }
+
+  // 轮播底部简介小字：+6px
+  .carousel-spot-desc {
+    font-size: calc(1em + 6px) !important;
+    font-weight: bold !important;
+  }
+
+  // 轮播底部景点名称：+6px（小字类）
+  .carousel-spot-name {
+    font-size: calc(1em + 6px) !important;
+    font-weight: bold !important;
+  }
+
+  // 右上角大字版切换按钮整体放大（使用transform确保整体放大且不影响布局）
+  .font-toggle-btn {
+    transform: scale(1.2) !important;
+    transform-origin: right center !important;
+    min-width: 140rpx !important;
+    padding: 0 28rpx !important;
+  }
+
+  // 大字版按钮文字：+8px
+  .font-toggle-text {
+    font-size: calc(1em + 8px) !important;
+    font-weight: bold !important;
+    white-space: nowrap !important;
+  }
+
+  // ═══════════════════════════════════════════════════════════════ //
+  // ────────── 四、底部导航栏专属CSS（大字模式生效）────────── //
+  // ═══════════════════════════════════════════════════════════════ //
+
+  // 隐藏导航图标
+  .uni-tabbar__icon,
+  .uni-tabbar__icon.uni-tabbar__icon__diff {
+    display: none !important;
+  }
+
+  // 导航文字：放大+8px、加粗、填满格子水平垂直居中、line-height:1
+  .uni-tabbar__label {
+    font-size: calc(1em + 8px) !important;
+    font-weight: bold !important;
+    width: 100% !important;
+    height: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    line-height: 1 !important;
+  }
+
+  // 导航项内容垂直居中
+  .uni-tabbar__item {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .uni-tabbar__bd {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  // 蓝色竖分割线加宽至2倍
+  .uni-tabbar__bd::before,
+  .uni-tabbar__bd::after {
+    width: 6px !important;
+  }
+
+  .uni-tabbar__item.tab-active .uni-tabbar__bd::before,
+  .uni-tabbar__item.tab-active .uni-tabbar__bd::after {
+    width: 6px !important;
+  }
+
+  // 导航栏整体尺寸完全不变，文字不溢出格子
+  .uni-tabbar {
+    height: 50px !important;
+    overflow: hidden !important;
+  }
+
+  .uni-tabbar__item {
+    height: 50px !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+  }
+
+  // ═══════════════════════════════════════════════════════════════ //
+  // ────────── 五、用户须知弹窗大字模式联动样式 ────────── //
+  // ═══════════════════════════════════════════════════════════════ //
+
+  .notice-title {
+    font-size: calc(1em + 8px) !important;
+    font-weight: bold !important;
+  }
+
+  .notice-text {
+    font-size: calc(1em + 7px) !important;
+    font-weight: bold !important;
+    line-height: 1.85 !important;
+  }
+
+  .notice-num {
+    font-size: calc(1em + 7px) !important;
+    font-weight: bold !important;
+  }
+
+  // 关闭按钮同步放大，适配老年用户
+  .notice-close {
+    width: 76rpx !important;
+    height: 76rpx !important;
+    font-size: 40rpx !important;
+  }
+
+  // 弹窗容器宽高尺寸不变（暖色融合版）
+  .notice-popup {
+    width: 60vw !important;
+    max-width: 720px !important;
+    max-height: 75vh !important;
+  }
+}

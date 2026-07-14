@@ -1,0 +1,7 @@
+# server.py 后端依赖
+# 安装：pip install -r requirements.txt  （需 Python 3.8+）
+#
+# server.py 的其余功能均使用 Python 标准库
+# （http.server / urllib / asyncio / threading 等），
+# 唯一的第三方依赖是 edge-tts（微软 Edge TTS 语音合成）。
+edge-tts==7.2.8

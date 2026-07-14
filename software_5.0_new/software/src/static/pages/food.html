@@ -1,0 +1,1650 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>美食 - 灵山胜境</title>
+<style>
+@import url("https://fontsapi.zeoseven.com/229/main/result.css");
+@import url("https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont/style.css");
+/* ========== 全局基础 ========== */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: "LXGW WenKai", serif;
+  min-height: 100vh;
+  background: #f7f2e3;
+  color: #4a3a2a;
+}
+
+/* ========== 顶部导航栏 ========== */
+.nav-bar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 24px;
+  background: rgba(255, 253, 245, 0.95);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(200, 185, 150, 0.15);
+}
+.nav-left, .nav-right { display: flex; align-items: center; gap: 8px; }
+.nav-title { font-size: 18px; font-weight: 600; color: #4a3a2a; letter-spacing: 2px; font-family: "PangMenZhengDao-Cu6.0", serif; }
+.nav-btn {
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  background: rgba(200, 185, 150, 0.12);
+  border: none;
+  color: rgba(74, 58, 42, 0.6);
+  font-size: 18px;
+  cursor: pointer;
+  transition: background 0.25s;
+}
+.nav-btn:hover { background: rgba(200, 185, 150, 0.25); }
+/* 左上角返回箭头加大 */
+.nav-left .nav-btn {
+  width: 48px; height: 48px;
+  font-size: 26px;
+}
+
+/* ========== 商家列表容器 ========== */
+.shop-list {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 16px 24px 60px;
+}
+
+/* ========== 单个商家卡片 ========== */
+.shop-card {
+  display: flex;
+  flex-direction: column;
+  background: #fffdf8;
+  border-radius: 14px;
+  margin-bottom: 14px;
+  box-shadow: 0 2px 12px rgba(180, 165, 130, 0.08);
+  border: 1px solid rgba(200, 185, 150, 0.12);
+  transition: box-shadow 0.3s;
+  overflow: hidden;
+  cursor: default;
+}
+.shop-card:hover { box-shadow: 0 4px 20px rgba(180, 165, 130, 0.18); }
+
+/* 顶部轮播图 */
+.shop-carousel {
+  position: relative;
+  width: 100%;
+  height: 220px;
+  overflow: hidden;
+  cursor: pointer;
+  background: linear-gradient(135deg, rgba(220, 210, 185, 0.3) 0%, rgba(200, 185, 150, 0.2) 100%);
+}
+.shop-carousel-track {
+  display: flex;
+  height: 100%;
+  transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.shop-carousel-track img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+/* 左右箭头 */
+.shop-carousel-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 32px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(255, 253, 245, 0.75);
+  border: none;
+  border-radius: 50%;
+  font-size: 16px;
+  color: rgba(74, 58, 42, 0.6);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.25s, background 0.25s;
+  z-index: 2;
+}
+.shop-carousel:hover .shop-carousel-btn { opacity: 1; }
+.shop-carousel-btn:hover { background: rgba(255, 253, 245, 0.95); }
+.shop-carousel-btn.prev { left: 10px; }
+.shop-carousel-btn.next { right: 10px; }
+/* 页码指示 */
+.shop-carousel-dots {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex; gap: 6px;
+  z-index: 2;
+}
+.shop-carousel-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: rgba(255, 253, 245, 0.55);
+  border: none; cursor: pointer;
+  padding: 0;
+  transition: background 0.25s;
+}
+.shop-carousel-dot.active { background: rgba(200, 120, 95, 0.85); width: 18px; border-radius: 4px; }
+
+/* 卡片文字内容区 */
+.shop-card-body {
+  padding: 18px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* 右侧信息区 */
+.shop-info { flex: 1; min-width: 0; }
+
+/* 店名行 */
+.shop-name-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+}
+.shop-name {
+  font-size: 17px;
+  font-weight: 600;
+  color: #3a2e1e;
+}
+.v-badge {
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(200, 160, 60, 0.8);
+  background: rgba(230, 200, 120, 0.12);
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+/* 距离+评分+品类+人均 行 */
+.shop-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: rgba(74, 58, 42, 0.55);
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+}
+.shop-meta .sep { color: rgba(200, 185, 150, 0.5); }
+.rating-blue { color: rgba(80, 130, 180, 0.85); font-weight: 600; }
+.rating-text { color: rgba(80, 130, 180, 0.7); font-size: 12px; }
+.price-red { color: rgba(190, 110, 90, 0.85); }
+
+/* 榜单标签 */
+.rank-tag {
+  display: inline-flex;
+  align-items: center;
+  font-size: 12px;
+  color: rgba(180, 145, 55, 0.85);
+  background: rgba(235, 205, 120, 0.1);
+  padding: 2px 8px;
+  border-radius: 4px;
+  margin-bottom: 6px;
+}
+
+/* 特色标签 */
+.feature-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 6px; }
+.ft-tag {
+  font-size: 11px;
+  color: rgba(120, 100, 70, 0.6);
+  border: 1px solid rgba(200, 185, 150, 0.2);
+  padding: 1px 7px;
+  border-radius: 3px;
+}
+
+/* 用户评价 */
+.shop-review {
+  font-size: 13px;
+  color: rgba(74, 58, 42, 0.6);
+  line-height: 1.5;
+  margin-bottom: 10px;
+  padding-left: 10px;
+  border-left: 3px solid rgba(200, 185, 150, 0.2);
+}
+.shop-review::before { content: "\201C"; color: rgba(200, 185, 150, 0.5); margin-right: 2px; }
+.shop-review::after { content: "\201D"; color: rgba(200, 185, 150, 0.5); margin-left: 2px; }
+
+/* 预订人数 */
+.booking-info {
+  font-size: 12px;
+  color: rgba(74, 58, 42, 0.45);
+  margin-bottom: 10px;
+}
+
+/* 团购套餐栏 */
+.deal-box {
+  background: rgba(245, 240, 228, 0.6);
+  border-radius: 10px;
+  padding: 10px 14px;
+  border: 1px solid rgba(200, 185, 150, 0.12);
+}
+.deal-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+  font-size: 13px;
+  flex-wrap: wrap;
+}
+.deal-item + .deal-item { border-top: 1px dashed rgba(200, 185, 150, 0.12); }
+.deal-title { color: rgba(74, 58, 42, 0.7); flex: 1; min-width: 0; }
+.deal-price { color: rgba(190, 110, 90, 0.9); font-weight: 600; font-size: 15px; }
+.deal-original { color: rgba(180, 165, 130, 0.5); text-decoration: line-through; font-size: 12px; }
+.deal-discount {
+  font-size: 11px;
+  color: rgba(190, 110, 90, 0.7);
+  background: rgba(220, 180, 160, 0.1);
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+.deal-save { font-size: 11px; color: rgba(180, 165, 130, 0.5); }
+.deal-subsidy {
+  font-size: 11px;
+  color: rgba(180, 145, 55, 0.7);
+  background: rgba(235, 205, 120, 0.1);
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+
+/* 提前订座标识 */
+.reserve-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11px;
+  color: rgba(120, 150, 100, 0.7);
+  background: rgba(200, 220, 190, 0.15);
+  padding: 2px 8px;
+  border-radius: 4px;
+  margin-left: 8px;
+}
+
+/* ========== 弹窗遮罩 ========== */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 999;
+  background: rgba(50, 40, 30, 0.55);
+  backdrop-filter: blur(4px);
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.2s ease;
+}
+.modal-overlay.active { display: flex; }
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* 弹窗内容 */
+.modal-content {
+  position: relative;
+  width: 92%;
+  max-width: 520px;
+  max-height: 85vh;
+  overflow-y: auto;
+  background: #fffdf8;
+  border-radius: 18px;
+  box-shadow: 0 12px 48px rgba(80, 60, 30, 0.22);
+  animation: slideUp 0.28s ease;
+}
+@keyframes slideUp { from { transform: translateY(24px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+/* 弹窗关闭按钮 */
+.modal-close {
+  position: absolute;
+  top: 12px; right: 12px;
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 253, 248, 0.9);
+  border: 1px solid rgba(200, 185, 150, 0.2);
+  color: rgba(74, 58, 42, 0.5);
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  transition: all 0.2s;
+}
+.modal-close:hover {
+  background: rgba(190, 110, 90, 0.08);
+  color: rgba(190, 110, 90, 0.8);
+}
+
+/* 弹窗图片 */
+.modal-hero {
+  width: 100%;
+  height: 240px;
+  border-radius: 18px 18px 0 0;
+  object-fit: cover;
+}
+
+/* 弹窗信息区 */
+.modal-body { padding: 20px 22px 24px; }
+
+.modal-name {
+  font-size: 20px;
+  font-weight: 700;
+  color: #3a2e1e;
+  margin-bottom: 8px;
+  line-height: 1.3;
+}
+
+.modal-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: rgba(74, 58, 42, 0.55);
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.modal-section-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #4a3a2a;
+  margin: 14px 0 8px;
+  padding-left: 8px;
+  border-left: 3px solid rgba(200, 160, 60, 0.5);
+}
+
+.modal-desc {
+  font-size: 14px;
+  color: rgba(74, 58, 42, 0.65);
+  line-height: 1.7;
+  margin-bottom: 8px;
+}
+
+.modal-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+.modal-tag {
+  font-size: 12px;
+  color: rgba(120, 100, 70, 0.65);
+  border: 1px solid rgba(200, 185, 150, 0.25);
+  padding: 3px 10px;
+  border-radius: 5px;
+}
+
+/* 弹窗价格区 */
+.modal-price-area {
+  background: linear-gradient(135deg, rgba(235, 205, 120, 0.08), rgba(230, 195, 115, 0.04));
+  border: 1px solid rgba(210, 185, 130, 0.18);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-top: 14px;
+}
+
+.modal-deal-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+  font-size: 14px;
+}
+.modal-deal-row + .modal-deal-row {
+  border-top: 1px dashed rgba(200, 185, 150, 0.15);
+}
+.modal-deal-name { color: rgba(74, 58, 42, 0.75); flex: 1; }
+.modal-deal-price {
+  font-size: 18px;
+  font-weight: 700;
+  color: rgba(190, 110, 90, 0.9);
+}
+.modal-deal-original {
+  font-size: 12px;
+  color: rgba(180, 165, 130, 0.5);
+  text-decoration: line-through;
+  margin-right: 6px;
+}
+.modal-deal-discount {
+  font-size: 11px;
+  color: #fff;
+  background: rgba(190, 110, 90, 0.75);
+  padding: 1px 6px;
+  border-radius: 3px;
+  margin-left: 6px;
+}
+
+.modal-tip {
+  text-align: center;
+  font-size: 12px;
+  color: rgba(180, 145, 55, 0.6);
+  margin-top: 10px;
+}
+
+/* ========== POV 透视景深效果 ========== */
+/* 页面外层容器：perspective 视角 */
+.pov-outer {
+  perspective: 4000px;
+  perspective-origin: 50% 50%;
+  min-height: 100vh;
+}
+
+/* 内容区：轻微仰角，营造 POV 景深 */
+.pov-inner {
+  transform: perspective(4000px) rotateX(0.15deg);
+  transform-origin: center center;
+  min-height: 100vh;
+}
+
+/* 四周边装饰条 */
+.pov-borders {
+  position: relative;
+}
+.pov-borders::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  border-left:   7px solid rgba(200, 185, 150, 0.28);
+  border-right:  7px solid rgba(200, 120, 95, 0.25);
+  border-top:    4px solid rgba(200, 120, 95, 0.22);
+  border-bottom: 4px solid rgba(200, 185, 150, 0.25);
+  pointer-events: none;
+  z-index: 200;
+}
+
+/* 景深虚化层：中心清晰、四周柔和虚化 */
+.pov-vignette {
+  position: relative;
+}
+.pov-vignette::after {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: radial-gradient(
+    ellipse 68% 65% at 50% 48%,
+    transparent 0%,
+    transparent 55%,
+    rgba(247, 242, 227, 0.18) 75%,
+    rgba(247, 242, 227, 0.38) 100%
+  );
+  pointer-events: none;
+  z-index: 199;
+}
+
+/* ========== 全屏图片预览弹窗 ========== */
+.img-preview-overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 9999;
+  background: rgba(247, 242, 227, 0.92);
+  backdrop-filter: blur(8px);
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  animation: ipFadeIn 0.3s ease;
+}
+.img-preview-overlay.active { display: flex; }
+@keyframes ipFadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* 关闭按钮 */
+.ip-close {
+  position: fixed;
+  top: 18px; left: 18px;
+  width: 40px; height: 40px;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(255, 253, 245, 0.85);
+  border: 1px solid rgba(200, 185, 150, 0.25);
+  border-radius: 50%;
+  font-size: 18px;
+  color: rgba(74, 58, 42, 0.6);
+  cursor: pointer;
+  z-index: 10001;
+  transition: background 0.25s;
+}
+.ip-close:hover { background: rgba(255, 253, 245, 1); }
+
+/* 预览大图 */
+.ip-container {
+  display: flex;
+  flex-direction: column;
+  max-width: 680px;
+  width: 92%;
+  max-height: 88vh;
+  overflow-y: auto;
+  background: #fffdf8;
+  border-radius: 18px;
+  box-shadow: 0 12px 48px rgba(80, 60, 30, 0.22);
+  margin: auto;
+  cursor: default;
+  animation: slideUp 0.28s ease;
+}
+
+.ip-image-area {
+  width: 100%;
+  max-height: 40vh;
+  overflow: hidden;
+  border-radius: 18px 18px 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(220, 210, 185, 0.3), rgba(200, 185, 150, 0.2));
+}
+.ip-image-area img {
+  max-width: 100%;
+  max-height: 40vh;
+  object-fit: contain;
+}
+
+.ip-info-area {
+  padding: 18px 22px 22px;
+}
+.ip-info-name {
+  font-size: 20px;
+  font-weight: 700;
+  color: #3a2e1e;
+  margin-bottom: 8px;
+}
+.ip-info-meta {
+  font-size: 13px;
+  color: rgba(74, 58, 42, 0.55);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.ip-info-desc {
+  font-size: 14px;
+  color: rgba(74, 58, 42, 0.65);
+  line-height: 1.7;
+  margin-bottom: 12px;
+}
+.ip-info-tags {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.ip-info-tag {
+  font-size: 12px;
+  color: rgba(120, 100, 70, 0.65);
+  border: 1px solid rgba(200, 185, 150, 0.25);
+  padding: 3px 10px;
+  border-radius: 5px;
+}
+.ip-info-deals {
+  background: rgba(245, 240, 228, 0.6);
+  border-radius: 10px;
+  padding: 10px 14px;
+  border: 1px solid rgba(200, 185, 150, 0.12);
+}
+.ip-info-deal-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 0;
+  font-size: 13px;
+}
+.ip-info-deal-row + .ip-info-deal-row {
+  border-top: 1px dashed rgba(200, 185, 150, 0.12);
+}
+.ip-info-deal-name { color: rgba(74, 58, 42, 0.75); flex: 1; }
+.ip-info-deal-price {
+  font-size: 16px;
+  font-weight: 700;
+  color: rgba(190, 110, 90, 0.9);
+}
+@keyframes ipZoomIn {
+  from { transform: scale(0.92); opacity: 0; }
+  to   { transform: scale(1);    opacity: 1; }
+}
+
+/* 左右切换箭头 */
+.ip-arrow {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px; height: 44px;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(255, 253, 245, 0.8);
+  border: 1px solid rgba(200, 185, 150, 0.2);
+  border-radius: 50%;
+  font-size: 20px;
+  color: rgba(74, 58, 42, 0.55);
+  cursor: pointer;
+  z-index: 10001;
+  transition: background 0.25s, color 0.25s;
+}
+.ip-arrow:hover { background: rgba(255, 253, 245, 0.95); color: rgba(74, 58, 42, 0.8); }
+.ip-arrow.prev { left: 18px; }
+.ip-arrow.next { right: 18px; }
+
+/* 底部页码 */
+.ip-page {
+  position: fixed;
+  bottom: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 13px;
+  color: rgba(74, 58, 42, 0.5);
+  background: rgba(255, 253, 245, 0.75);
+  padding: 4px 14px;
+  border-radius: 12px;
+  z-index: 10001;
+  font-family: "LXGW WenKai", serif;
+}
+</style>
+</head>
+<body>
+<!-- POV 透视景深外层 -->
+<div class="pov-outer">
+<div class="pov-inner pov-borders pov-vignette">
+
+<!-- ====== 顶部导航栏 ====== -->
+<div class="nav-bar">
+  <div class="nav-left">
+    <button class="nav-btn" onclick="history.back()">‹</button>
+  </div>
+  <div class="nav-title">周边美食</div>
+  <div class="nav-right">
+    <button class="nav-btn">🔊</button>
+    <button class="nav-btn" onclick="history.back()">✕</button>
+  </div>
+</div>
+
+<!-- ====== 商家列表 ====== -->
+<div class="shop-list">
+
+  <!-- 1. 丽景轩渔蟹馆 -->
+  <div class="shop-card">
+    <div class="shop-carousel" onclick="openImgPreview(0, 0)">
+      <div class="shop-carousel-track" id="carousel-0">
+        <img src="../food-shops/lijingxuan.jpg" alt="丽景轩渔蟹馆">
+      </div>
+      <button class="shop-carousel-btn prev" onclick="event.stopPropagation(); carouselPrev(0)">‹</button>
+      <button class="shop-carousel-btn next" onclick="event.stopPropagation(); carouselNext(0)">›</button>
+      <div class="shop-carousel-dots" id="dots-0"></div>
+    </div>
+    <div class="shop-card-body">
+      <div class="shop-name-row">
+        <span class="shop-name">丽景轩渔蟹馆</span>
+      </div>
+      <div class="shop-meta">
+        距灵山胜境约500米
+        <span class="sep">|</span>
+        <span class="rating-blue">4.7</span><span class="rating-text">超棒</span>
+        <span class="sep">|</span> 农家菜
+        <span class="sep">|</span> 人均<span class="price-red">¥50</span>/人
+      </div>
+      <div class="rank-tag">🏷 滨湖区私房菜榜第1名</div>
+      <div class="feature-tags"><span class="ft-tag">太湖白虾</span><span class="ft-tag">特色鱼头</span></div>
+      <div class="shop-review">白虾新鲜可口，深受孩子喜爱，农家风味地道。</div>
+      <div class="booking-info">430人预订</div>
+      <div class="deal-box">
+        <div class="deal-item">
+          <span class="deal-title">特色鱼头套餐（春日专享）</span>
+          <span class="deal-price">¥323.2</span>
+          <span class="deal-original">¥778</span>
+          <span class="deal-discount">4.2折</span>
+        </div>
+      </div>
+      <div style="margin-top:10px;">
+        <button class="nav-btn" style="width:auto;padding:0 14px;font-size:13px;border-radius:20px;" onclick="event.stopPropagation();openModal(0)">📋 查看详情</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. 渔家私房菜 -->
+  <div class="shop-card">
+    <div class="shop-carousel" onclick="openImgPreview(1, 0)">
+      <div class="shop-carousel-track" id="carousel-1">
+        <img src="../food-shops/yujia-sifangcai.jpg" alt="渔家私房菜">
+      </div>
+      <button class="shop-carousel-btn prev" onclick="event.stopPropagation(); carouselPrev(1)">‹</button>
+      <button class="shop-carousel-btn next" onclick="event.stopPropagation(); carouselNext(1)">›</button>
+      <div class="shop-carousel-dots" id="dots-1"></div>
+    </div>
+    <div class="shop-card-body">
+      <div class="shop-name-row">
+        <span class="shop-name">渔家私房菜</span>
+        <span class="v-badge">V5</span>
+      </div>
+      <div class="shop-meta">
+        距灵山胜境约480米
+        <span class="sep">|</span>
+        <span class="rating-blue">4.6</span><span class="rating-text">超棒</span>
+        <span class="sep">|</span> 中餐·私房菜
+        <span class="sep">|</span> 人均<span class="price-red">¥62</span>/人
+      </div>
+      <div class="rank-tag">🏷 滨湖区私房菜榜第3名</div>
+      <div class="feature-tags"><span class="ft-tag">太湖白鱼</span><span class="ft-tag">特制酱汁</span></div>
+      <div class="shop-review">太湖白鱼新鲜嫩滑，搭配特制酱汁，回味无穷。</div>
+      <div class="booking-info">193人预订</div>
+      <div class="deal-box">
+        <div class="deal-item">
+          <span class="deal-title">无锡本地风味3-4人餐</span>
+          <span class="deal-price">¥167.2</span>
+          <span class="deal-original">¥323</span>
+          <span class="deal-discount">5.2折</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. 佳佳姐私房菜 -->
+  <div class="shop-card">
+    <div class="shop-carousel" onclick="openImgPreview(2, 0)">
+      <div class="shop-carousel-track" id="carousel-2">
+        <img src="../food-shops/jiajiajie.jpg" alt="佳佳姐私房菜">
+      </div>
+      <button class="shop-carousel-btn prev" onclick="event.stopPropagation(); carouselPrev(2)">‹</button>
+      <button class="shop-carousel-btn next" onclick="event.stopPropagation(); carouselNext(2)">›</button>
+      <div class="shop-carousel-dots" id="dots-2"></div>
+    </div>
+    <div class="shop-card-body">
+      <div class="shop-name-row">
+        <span class="shop-name">佳佳姐私房菜</span>
+        <span class="v-badge">V4</span>
+      </div>
+      <div class="shop-meta">
+        距灵山胜境约600米
+        <span class="sep">|</span>
+        <span class="rating-blue">4.5</span><span class="rating-text">超棒</span>
+        <span class="sep">|</span> 私房菜
+        <span class="sep">|</span> 人均<span class="price-red">¥45</span>/人
+        <span class="sep">|</span> 17年老字号
+      </div>
+      <div class="feature-tags"><span class="ft-tag">老字号</span><span class="ft-tag">家常味</span></div>
+      <div class="shop-review">17年老店，味道始终如一，本地人常来。</div>
+      <div class="booking-info">280人去过</div>
+      <div class="deal-box">
+        <div class="deal-item">
+          <span class="deal-title">招牌私房菜双人餐</span>
+          <span class="deal-price">¥128</span>
+          <span class="deal-original">¥198</span>
+          <span class="deal-discount">6.5折</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. 汤和无锡菜 -->
+  <div class="shop-card">
+    <div class="shop-carousel" onclick="openImgPreview(3, 0)">
+      <div class="shop-carousel-track" id="carousel-3">
+        <img src="../food-shops/tanghe-wuxi.jpg" alt="汤和无锡菜">
+      </div>
+      <button class="shop-carousel-btn prev" onclick="event.stopPropagation(); carouselPrev(3)">‹</button>
+      <button class="shop-carousel-btn next" onclick="event.stopPropagation(); carouselNext(3)">›</button>
+      <div class="shop-carousel-dots" id="dots-3"></div>
+    </div>
+    <div class="shop-card-body">
+      <div class="shop-name-row">
+        <span class="shop-name">汤和无锡菜</span>
+      </div>
+      <div class="shop-meta">
+        距灵山胜境约550米
+        <span class="sep">|</span>
+        <span class="rating-blue">4.4</span><span class="rating-text">很好</span>
+        <span class="sep">|</span> 无锡菜
+        <span class="sep">|</span> 人均<span class="price-red">¥58</span>/人
+      </div>
+      <div class="feature-tags"><span class="ft-tag">螺丝汤</span><span class="ft-tag">无锡本帮菜</span></div>
+      <div class="shop-review">招牌螺丝汤鲜香浓郁，无锡口味正宗。</div>
+      <div class="booking-info">156人去过</div>
+      <div class="deal-box">
+        <div class="deal-item">
+          <span class="deal-title">经典无锡菜2-3人套餐</span>
+          <span class="deal-price">¥158</span>
+          <span class="deal-original">¥268</span>
+          <span class="deal-discount">5.9折</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. 渔味坊 -->
+  <div class="shop-card">
+    <div class="shop-carousel" onclick="openImgPreview(4, 0)">
+      <div class="shop-carousel-track" id="carousel-4">
+        <img src="../food-shops/yuweifang.jpg" alt="渔味坊">
+      </div>
+      <button class="shop-carousel-btn prev" onclick="event.stopPropagation(); carouselPrev(4)">‹</button>
+      <button class="shop-carousel-btn next" onclick="event.stopPropagation(); carouselNext(4)">›</button>
+      <div class="shop-carousel-dots" id="dots-4"></div>
+    </div>
+    <div class="shop-card-body">
+      <div class="shop-name-row">
+        <span class="shop-name">渔味坊(拈花湾景区店)</span>
+        <span class="v-badge">V4</span>
+      </div>
+      <div class="shop-meta">
+        距灵山胜境约464米
+        <span class="sep">|</span>
+        <span class="rating-blue">4.4</span><span class="rating-text">很好</span>
+        <span class="sep">|</span> 中餐
+        <span class="sep">|</span> 人均<span class="price-red">¥72</span>/人
+      </div>
+      <div class="rank-tag">🏷 入选滨湖区私房菜榜</div>
+      <div class="feature-tags"><span class="ft-tag">盐水白虾</span><span class="ft-tag">青菜面筋</span></div>
+      <div class="shop-review">青菜面筋味道出众，让人吃两碗饭。</div>
+      <div class="booking-info">219人预订</div>
+      <div class="deal-box">
+        <div class="deal-item">
+          <span class="deal-title">【夏日尝鲜】小锅现做套餐</span>
+          <span class="deal-price">¥139</span>
+        </div>
+        <div class="deal-item">
+          <span class="deal-title">【夏日尝鲜】家庭套餐</span>
+          <span class="deal-price">¥231.21</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. 五口灶下饭小炒 -->
+  <div class="shop-card">
+    <div class="shop-carousel" onclick="openImgPreview(5, 0)">
+      <div class="shop-carousel-track" id="carousel-5">
+        <img src="../food-shops/wukouzao.jpg" alt="五口灶下饭小炒">
+      </div>
+      <button class="shop-carousel-btn prev" onclick="event.stopPropagation(); carouselPrev(5)">‹</button>
+      <button class="shop-carousel-btn next" onclick="event.stopPropagation(); carouselNext(5)">›</button>
+      <div class="shop-carousel-dots" id="dots-5"></div>
+    </div>
+    <div class="shop-card-body">
+      <div class="shop-name-row">
+        <span class="shop-name">五口灶 | 现炒下饭小炒</span>
+        <span class="v-badge">V5</span>
+      </div>
+      <div class="shop-meta">
+        距灵山胜境约4公里
+        <span class="sep">|</span>
+        <span class="rating-blue">4.4</span><span class="rating-text">很好</span>
+        <span class="sep">|</span> 小炒快餐
+        <span class="sep">|</span> 人均<span class="price-red">¥32</span>/人
+      </div>
+      <div class="feature-tags"><span class="ft-tag">小炒肉</span><span class="ft-tag">现炒</span><span class="ft-tag">下饭神器</span></div>
+      <div class="shop-review">中国社区下饭小炒，锅气十足，性价比超高。</div>
+      <div class="booking-info">102人预订</div>
+      <div class="deal-box">
+        <div class="deal-item">
+          <span class="deal-title">【聚会主推】3-4人餐</span>
+          <span class="deal-price">¥90.31</span>
+        </div>
+        <div class="deal-item">
+          <span class="deal-title">【招牌鱼+小炒肉】套餐</span>
+          <span class="deal-price">¥65.4</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7. 马姐菜饭 -->
+  <div class="shop-card">
+    <div class="shop-carousel" onclick="openImgPreview(6, 0)">
+      <div class="shop-carousel-track" id="carousel-6">
+        <img src="../food-shops/maji-caifan.jpg" alt="马姐菜饭">
+      </div>
+      <button class="shop-carousel-btn prev" onclick="event.stopPropagation(); carouselPrev(6)">‹</button>
+      <button class="shop-carousel-btn next" onclick="event.stopPropagation(); carouselNext(6)">›</button>
+      <div class="shop-carousel-dots" id="dots-6"></div>
+    </div>
+    <div class="shop-card-body">
+      <div class="shop-name-row">
+        <span class="shop-name">马姐菜饭</span>
+      </div>
+      <div class="shop-meta">
+        距灵山胜境约700米
+        <span class="sep">|</span>
+        <span class="rating-blue">4.3</span><span class="rating-text">很好</span>
+        <span class="sep">|</span> 快餐·菜饭
+        <span class="sep">|</span> 人均<span class="price-red">¥22</span>/人
+      </div>
+      <div class="feature-tags"><span class="ft-tag">菜饭</span><span class="ft-tag">实惠</span><span class="ft-tag">快速出餐</span></div>
+      <div class="shop-review">菜饭香软入味，分量足，打工人的食堂。</div>
+      <div class="booking-info">380人去过</div>
+      <div class="deal-box">
+        <div class="deal-item">
+          <span class="deal-title">招牌菜饭单人餐</span>
+          <span class="deal-price">¥18</span>
+          <span class="deal-original">¥25</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 8. 澄园 -->
+  <div class="shop-card">
+    <div class="shop-carousel" onclick="openImgPreview(7, 0)">
+      <div class="shop-carousel-track" id="carousel-7">
+        <img src="../food-shops/chengyuan-lingfuyuan.jpg" alt="澄园">
+      </div>
+      <button class="shop-carousel-btn prev" onclick="event.stopPropagation(); carouselPrev(7)">‹</button>
+      <button class="shop-carousel-btn next" onclick="event.stopPropagation(); carouselNext(7)">›</button>
+      <div class="shop-carousel-dots" id="dots-7"></div>
+    </div>
+    <div class="shop-card-body">
+      <div class="shop-name-row">
+        <span class="shop-name">澄园(灵福缘)</span>
+        <span class="v-badge">V3</span>
+      </div>
+      <div class="shop-meta">
+        距灵山胜境约450米
+        <span class="sep">|</span>
+        <span class="rating-blue">4.5</span><span class="rating-text">超棒</span>
+        <span class="sep">|</span> 园林餐厅
+        <span class="sep">|</span> 人均<span class="price-red">¥66</span>/人
+      </div>
+      <div class="rank-tag">🏷 入选滨湖区私房菜榜</div>
+      <div class="feature-tags"><span class="ft-tag">太湖银鱼羹</span><span class="ft-tag">园林环境</span><span class="ft-tag">包间</span></div>
+      <div class="shop-review">庭院深深，竹林环绕，用餐体验极佳。</div>
+      <div class="booking-info">401人去过</div>
+      <div class="deal-box">
+        <div class="deal-item">
+          <span class="deal-title">焕新补贴套餐一</span>
+          <span class="deal-price">¥310.66</span>
+          <span class="deal-subsidy">省388.34</span>
+        </div>
+        <div class="deal-item">
+          <span class="deal-title">焕新补贴套餐二</span>
+          <span class="deal-price">¥144.84</span>
+          <span class="deal-subsidy">省107.16</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 9. 小吴越 -->
+  <div class="shop-card">
+    <div class="shop-carousel" onclick="openImgPreview(8, 0)">
+      <div class="shop-carousel-track" id="carousel-8">
+        <img src="../food-shops/xiaowuyue.jpg" alt="小吴越">
+      </div>
+      <button class="shop-carousel-btn prev" onclick="event.stopPropagation(); carouselPrev(8)">‹</button>
+      <button class="shop-carousel-btn next" onclick="event.stopPropagation(); carouselNext(8)">›</button>
+      <div class="shop-carousel-dots" id="dots-8"></div>
+    </div>
+    <div class="shop-card-body">
+      <div class="shop-name-row">
+        <span class="shop-name">小吴越</span>
+      </div>
+      <div class="shop-meta">
+        距灵山胜境约800米
+        <span class="sep">|</span>
+        <span class="rating-blue">4.6</span><span class="rating-text">超棒</span>
+        <span class="sep">|</span> 苏浙菜
+        <span class="sep">|</span> 人均<span class="price-red">¥68</span>/人
+      </div>
+      <div class="feature-tags"><span class="ft-tag">苏式风味</span><span class="ft-tag">精致装修</span><span class="ft-tag">江南风情</span></div>
+      <div class="shop-review">苏浙融合菜品精致，环境雅致有格调。</div>
+      <div class="booking-info">225人去过</div>
+      <div class="deal-box">
+        <div class="deal-item">
+          <span class="deal-title">小吴越精选双人餐</span>
+          <span class="deal-price">¥168</span>
+          <span class="deal-original">¥268</span>
+          <span class="deal-discount">6.3折</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 10. 朱記小館 -->
+  <div class="shop-card">
+    <div class="shop-carousel" onclick="openImgPreview(9, 0)">
+      <div class="shop-carousel-track" id="carousel-9">
+        <img src="../food-shops/zhuji-xiaoji.jpg" alt="朱記小館">
+      </div>
+      <button class="shop-carousel-btn prev" onclick="event.stopPropagation(); carouselPrev(9)">‹</button>
+      <button class="shop-carousel-btn next" onclick="event.stopPropagation(); carouselNext(9)">›</button>
+      <div class="shop-carousel-dots" id="dots-9"></div>
+    </div>
+    <div class="shop-card-body">
+      <div class="shop-name-row">
+        <span class="shop-name">朱記小館 VERMILION HOUSE</span>
+        <span class="v-badge">V5</span>
+      </div>
+      <div class="shop-meta">
+        距灵山胜境约900米
+        <span class="sep">|</span>
+        <span class="rating-blue">4.7</span><span class="rating-text">超棒</span>
+        <span class="sep">|</span> 创意中餐
+        <span class="sep">|</span> 人均<span class="price-red">¥78</span>/人
+      </div>
+      <div class="feature-tags"><span class="ft-tag">老手艺</span><span class="ft-tag">烟火气</span><span class="ft-tag">好味道</span></div>
+      <div class="shop-review">老手艺传承，烟火气十足，好味道值得回味。</div>
+      <div class="booking-info">310人预订</div>
+      <div class="deal-box">
+        <div class="deal-item">
+          <span class="deal-title">朱記招牌创意双人餐</span>
+          <span class="deal-price">¥198</span>
+          <span class="deal-original">¥328</span>
+          <span class="deal-discount">6折</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 11. 屋里香私房菜 -->
+  <div class="shop-card">
+    <div class="shop-carousel" onclick="openImgPreview(10, 0)">
+      <div class="shop-carousel-track" id="carousel-10">
+        <img src="../food-shops/wulixiang-sifangcai.jpg" alt="屋里香私房菜">
+      </div>
+      <button class="shop-carousel-btn prev" onclick="event.stopPropagation(); carouselPrev(10)">‹</button>
+      <button class="shop-carousel-btn next" onclick="event.stopPropagation(); carouselNext(10)">›</button>
+      <div class="shop-carousel-dots" id="dots-10"></div>
+    </div>
+    <div class="shop-card-body">
+      <div class="shop-name-row">
+        <span class="shop-name">屋里香私房菜</span>
+        <span class="v-badge">V4</span>
+      </div>
+      <div class="shop-meta">
+        距灵山胜境约650米
+        <span class="sep">|</span>
+        <span class="rating-blue">4.5</span><span class="rating-text">超棒</span>
+        <span class="sep">|</span> 私房菜·锡帮菜
+        <span class="sep">|</span> 人均<span class="price-red">¥55</span>/人
+      </div>
+      <div class="feature-tags"><span class="ft-tag">醉美锡城</span><span class="ft-tag">锡帮菜</span><span class="ft-tag">夜宵</span></div>
+      <div class="shop-review">醉美锡城的私房味道，锡帮菜做得地道。</div>
+      <div class="booking-info">267人去过</div>
+      <div class="deal-box">
+        <div class="deal-item">
+          <span class="deal-title">锡帮特色双人餐</span>
+          <span class="deal-price">¥138</span>
+          <span class="deal-original">¥218</span>
+          <span class="deal-discount">6.3折</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 12. 许府牛 -->
+  <div class="shop-card">
+    <div class="shop-carousel" onclick="openImgPreview(11, 0)">
+      <div class="shop-carousel-track" id="carousel-11">
+        <img src="../food-shops/xufuniu.jpg" alt="许府牛">
+      </div>
+      <button class="shop-carousel-btn prev" onclick="event.stopPropagation(); carouselPrev(11)">‹</button>
+      <button class="shop-carousel-btn next" onclick="event.stopPropagation(); carouselNext(11)">›</button>
+      <div class="shop-carousel-dots" id="dots-11"></div>
+    </div>
+    <div class="shop-card-body">
+      <div class="shop-name-row">
+        <span class="shop-name">许府牛 I miss niu</span>
+        <span class="v-badge">V6</span>
+      </div>
+      <div class="shop-meta">
+        距灵山胜境约3.5公里
+        <span class="sep">|</span>
+        <span class="rating-blue">4.3</span><span class="rating-text">很好</span>
+        <span class="sep">|</span> 牛杂火锅
+        <span class="sep">|</span> 人均<span class="price-red">¥72</span>/人
+      </div>
+      <div class="rank-tag">🏷 滨湖区火锅榜推荐</div>
+      <div class="feature-tags"><span class="ft-tag">牛杂</span><span class="ft-tag">牛肉火锅</span><span class="ft-tag">周年庆</span></div>
+      <div class="shop-review">牛杂处理干净，汤底醇厚，周年庆优惠多。</div>
+      <div class="booking-info">520人预订</div>
+      <div class="deal-box">
+        <div class="deal-item">
+          <span class="deal-title">招牌牛杂双人火锅套餐</span>
+          <span class="deal-price">¥158</span>
+          <span class="deal-original">¥268</span>
+          <span class="deal-discount">5.9折</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 13. 吃个川川 -->
+  <div class="shop-card">
+    <div class="shop-carousel" onclick="openImgPreview(12, 0)">
+      <div class="shop-carousel-track" id="carousel-12">
+        <img src="../food-shops/chige-chuanchuan.jpg" alt="吃个川川">
+      </div>
+      <button class="shop-carousel-btn prev" onclick="event.stopPropagation(); carouselPrev(12)">‹</button>
+      <button class="shop-carousel-btn next" onclick="event.stopPropagation(); carouselNext(12)">›</button>
+      <div class="shop-carousel-dots" id="dots-12"></div>
+    </div>
+    <div class="shop-card-body">
+      <div class="shop-name-row">
+        <span class="shop-name">吃个川川 · 猛火现炒</span>
+      </div>
+      <div class="shop-meta">
+        距灵山胜境约4公里
+        <span class="sep">|</span>
+        <span class="rating-blue">4.2</span><span class="rating-text">很好</span>
+        <span class="sep">|</span> 川菜·麻辣
+        <span class="sep">|</span> 人均<span class="price-red">¥35</span>/人
+      </div>
+      <div class="feature-tags"><span class="ft-tag">猛火现炒</span><span class="ft-tag">川香麻辣</span><span class="ft-tag">下饭</span></div>
+      <div class="shop-review">猛火现炒够镬气，川香麻辣过瘾。</div>
+      <div class="booking-info">198人去过</div>
+      <div class="deal-box">
+        <div class="deal-item">
+          <span class="deal-title">川味经典双人套餐</span>
+          <span class="deal-price">¥68.8</span>
+          <span class="deal-original">¥108</span>
+          <span class="deal-discount">6.4折</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 14. 悦君食府 -->
+  <div class="shop-card">
+    <div class="shop-carousel" onclick="openImgPreview(13, 0)">
+      <div class="shop-carousel-track" id="carousel-13">
+        <img src="../food-shops/yuejun-shifu.jpg" alt="悦君食府">
+      </div>
+      <button class="shop-carousel-btn prev" onclick="event.stopPropagation(); carouselPrev(13)">‹</button>
+      <button class="shop-carousel-btn next" onclick="event.stopPropagation(); carouselNext(13)">›</button>
+      <div class="shop-carousel-dots" id="dots-13"></div>
+    </div>
+    <div class="shop-card-body">
+      <div class="shop-name-row">
+        <span class="shop-name">悦君食府</span>
+        <span class="v-badge">V5</span>
+      </div>
+      <div class="shop-meta">
+        距灵山胜境约1公里
+        <span class="sep">|</span>
+        <span class="rating-blue">4.6</span><span class="rating-text">超棒</span>
+        <span class="sep">|</span> 本帮菜
+        <span class="sep">|</span> 人均<span class="price-red">¥62</span>/人
+      </div>
+      <div class="feature-tags"><span class="ft-tag">本帮菜</span><span class="ft-tag">招聘服务</span><span class="ft-tag">聚餐首选</span></div>
+      <div class="shop-review">蓝色霓虹招牌亮眼，店内装修雅致大气。</div>
+      <div class="booking-info">340人去过</div>
+      <div class="deal-box">
+        <div class="deal-item">
+          <span class="deal-title">悦君招牌本帮双人餐</span>
+          <span class="deal-price">¥148</span>
+          <span class="deal-original">¥238</span>
+          <span class="deal-discount">6.2折</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 15. 灵福缘私房菜 -->
+  <div class="shop-card">
+    <div class="shop-carousel" onclick="openImgPreview(14, 0)">
+      <div class="shop-carousel-track" id="carousel-14">
+        <img src="../food-shops/lingfuyuan.jpg" alt="灵福缘私房菜">
+      </div>
+      <button class="shop-carousel-btn prev" onclick="event.stopPropagation(); carouselPrev(14)">‹</button>
+      <button class="shop-carousel-btn next" onclick="event.stopPropagation(); carouselNext(14)">›</button>
+      <div class="shop-carousel-dots" id="dots-14"></div>
+    </div>
+    <div class="shop-card-body">
+      <div class="shop-name-row">
+        <span class="shop-name">灵福缘私房菜</span>
+        <span class="v-badge">V3</span>
+      </div>
+      <div class="shop-meta">
+        距灵山胜境约458米
+        <span class="sep">|</span>
+        <span class="rating-blue">4.5</span><span class="rating-text">超棒</span>
+        <span class="sep">|</span> 私房菜
+        <span class="sep">|</span> 人均<span class="price-red">¥66</span>/人
+        <span class="sep">|</span> 158号营业中
+      </div>
+      <div class="rank-tag">🏷 灵山周边人气私房菜</div>
+      <div class="feature-tags"><span class="ft-tag">太湖银鱼羹</span><span class="ft-tag">凉拌鸭胗</span><span class="ft-tag">船菜</span></div>
+      <div class="shop-review">传统建筑门面，灵山周边人气私房菜，太湖风味。</div>
+      <div class="booking-info">401人去过</div>
+      <div class="deal-box">
+        <div class="deal-item">
+          <span class="deal-title">灵福缘招牌套餐（含大闸蟹）</span>
+          <span class="deal-price">¥298</span>
+          <span class="deal-original">¥468</span>
+          <span class="deal-discount">6.4折</span>
+        </div>
+        <div class="deal-item">
+          <span class="deal-title">经典私房菜双人餐</span>
+          <span class="deal-price">¥144.84</span>
+          <span class="deal-subsidy">省107.16</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// 商家数据（用于弹窗）
+var shops = [
+  {
+    name: "丽景轩渔蟹馆",
+    img: "../food-shops/lijingxuan.jpg",
+    meta: "距灵山胜境约500米 | ⭐4.7 超棒 | 农家菜 | 人均 ¥50/人",
+    desc: "丽景轩渔蟹馆位于灵山景区周边，以经营太湖湖鲜和农家菜为特色。招牌白虾新鲜可口，深受游客喜爱。店内环境古朴典雅，红灯笼点缀其中，充满江南水乡韵味。是滨湖区私房菜榜第1名的实力店铺。",
+    tags: ["太湖白虾", "特色鱼头", "农家风味", "滨湖区私房菜榜第1名"],
+    deals: [
+      { name: "特色鱼头套餐（春日专享）", price: "323.2", original: "778", discount: "4.2折" },
+      { name: "太湖三白双人尝鲜餐", price: "188", original: "328", discount: "5.7折" },
+      { name: "农家土菜四人聚会套餐", price: "568", original: "888", discount: "6.4折" }
+    ]
+  },
+  {
+    name: "渔家私房菜",
+    img: "../food-shops/yujia-sifangcai.jpg",
+    meta: "距灵山胜境约480米 | ⭐4.6 超棒 | 中餐·私房菜 | 人均 ¥62/人",
+    desc: "渔家私房菜是一家地道的私房菜馆，主打太湖河鲜和无锡本帮菜。白墙灰瓦的建筑风格配上红灯笼，江南水乡气息扑面而来。太湖白鱼是镇店之宝，新鲜嫩滑，搭配秘制酱汁回味无穷。",
+    tags: ["太湖白鱼", "特制酱汁", "私房菜", "滨湖区私房菜榜第3名"],
+    deals: [
+      { name: "无锡本地风味3-4人餐", price: "167.2", original: "323", discount: "5.2折" },
+      { name: "招牌太湖白鱼套餐", price: "138", original: "218", discount: "6.3折" }
+    ]
+  },
+  {
+    name: "佳佳姐私房菜",
+    img: "../food-shops/jiajiajie.jpg",
+    meta: "距灵山胜境约600米 | ⭐4.5 超棒 | 私房菜 | 人均 ¥45/人 | 17年老字号",
+    desc: "佳佳姐私房菜是一家拥有17年历史的老字号私房菜馆。酒红色门面醒目大气，「17年老字号」的招牌彰显口碑。店内菜品坚持传统做法，味道始终如一，是本地食客的常去之地。",
+    tags: ["17年老字号", "家常味", "传统做法", "性价比高"],
+    deals: [
+      { name: "招牌私房菜双人餐", price: "128", original: "198", discount: "6.5折" },
+      { name: "老字号经典四人套餐", price: "268", original: "418", discount: "6.4折" }
+    ]
+  },
+  {
+    name: "汤和无锡菜",
+    img: "../food-shops/tanghe-wuxi.jpg",
+    meta: "距灵山胜境约550米 | ⭐4.4 很好 | 无锡菜 | 人均 ¥58/人",
+    desc: "汤和无锡菜专注于无锡本帮菜的烹饪与传承。门口LED屏滚动播放「锡和无锡菜」，招牌螺丝汤是必点菜品，鲜香浓郁，汤底熬制数小时。店内装修简约温馨，适合家庭聚餐。",
+    tags: ["螺丝汤", "无锡本帮菜", "慢火熬制", "家庭聚餐"],
+    deals: [
+      { name: "经典无锡菜2-3人套餐", price: "158", original: "268", discount: "5.9折" },
+      { name: "招牌螺丝汤品鉴餐", price: "88", original: "138", discount: "6.4折" }
+    ]
+  },
+  {
+    name: "渔味坊(拈花湾景区店)",
+    img: "../food-shops/yuweifang.jpg",
+    meta: "距灵山胜境约464米 | ⭐4.4 很好 | 中餐 | 人均 ¥72/人",
+    desc: "渔味坊位于拈花湾景区附近，白墙灰瓦的传统建筑风格十分吸睛。店内主营江浙风味菜肴，盐水白虾和青菜面筋是招牌菜品。面筋入味好吃到让人连干两碗饭，深受游客好评。",
+    tags: ["盐水白虾", "青菜面筋", "江浙风味", "入选滨湖区私房菜榜"],
+    deals: [
+      { name: "【夏日尝鲜】小锅现做套餐", price: "139" },
+      { name: "【夏日尝鲜】家庭套餐", price: "231.21" },
+      { name: "招牌面筋双人套餐", price: "98", original: "168", discount: "5.8折" }
+    ]
+  },
+  {
+    name: "五口灶 | 现炒下饭小炒",
+    img: "../food-shops/wukouzao.jpg",
+    meta: "距灵山胜境约4公里 | ⭐4.4 很好 | 小炒快餐 | 人均 ¥32/人",
+    desc: "五口灶是一家主打「现炒下饭小炒」的快餐品牌，黄色明亮的门面设计非常醒目。「中国社区下饭小炒」的定位精准，招牌小炒肉锅气十足，土豆丝盖浇饭、辣椒炒肉等都是人气单品。性价比极高，是打工人和学生党的最爱。",
+    tags: ["小炒肉", "现炒", "下饭神器", "高性价比", "社区人气店"],
+    deals: [
+      { name: "【聚会主推】3-4人餐", price: "90.31" },
+      { name: "【招牌鱼+小炒肉】套餐", price: "65.4" },
+      { name: "单人工作餐（饭+菜+汤）", price: "22", original: "32", discount: "6.9折" }
+    ]
+  },
+  {
+    name: "马姐菜饭",
+    img: "../food-shops/maji-caifan.jpg",
+    meta: "距灵山胜境约700米 | ⭐4.3 很好 | 快餐·菜饭 | 人均 ¥22/人",
+    desc: "马姐菜饭是一家亲民的快餐店，红色背景搭配醒目的黄色「马姐菜饭」四个大字。主打各类菜饭组合，出餐快速、价格实惠，是附近居民和上班族的首选午餐地点。门口红灯笼增添了几分烟火气息。",
+    tags: ["菜饭", "实惠", "快速出餐", "上班族最爱"],
+    deals: [
+      { name: "招牌菜饭单人餐", price: "18", original: "25" },
+      { name: "豪华菜饭双人套餐", price: "42", original: "58", discount: "7.2折" }
+    ]
+  },
+  {
+    name: "澄园(灵福缘)",
+    img: "../food-shops/chengyuan-lingfuyuan.jpg",
+    meta: "距灵山胜境约450米 | ⭐4.5 超棒 | 园林餐厅 | 人均 ¥66/人",
+    desc: "澄园又名灵福缘，是一处极具特色的园林风格餐厅。入口处木制牌楼上书写着苍劲有力的书法字「澄园」，穿过牌楼可见竹林环绕的庭院，绿伞遮阳、石板铺地，仿佛走进了一处隐世桃源。用餐环境清幽雅致，太湖银鱼羹是招牌。",
+    tags: ["园林环境", "太湖银鱼羹", "包间", "隐世桃源感", "入选滨湖区私房菜榜"],
+    deals: [
+      { name: "焕新补贴套餐一", price: "310.66", subsidy: "省388.34" },
+      { name: "焕新补贴套餐二", price: "144.84", subsidy: "省107.16" },
+      { name: "园林私房菜四人宴", price: "398", original: "688", discount: "5.8折" }
+    ]
+  },
+  {
+    name: "小吴越 XIAO WU YUE",
+    img: "../food-shops/xiaowuyue.jpg",
+    meta: "距灵山胜境约800米 | ⭐4.6 超棒 | 苏浙菜 | 人均 ¥68/人",
+    desc: "小吴越是一家精致的苏浙融合菜餐厅。蓝色调的门面配以传统飞檐设计，粉色樱花装饰增添浪漫氛围。店内装修雅致，融合了苏州与杭州两地菜系的精髓，菜品精致讲究摆盘，是约会和家庭聚餐的上佳选择。",
+    tags: ["苏式风味", "精致装修", "江南风情", "融合菜系"],
+    deals: [
+      { name: "小吴越精选双人餐", price: "168", original: "268", discount: "6.3折" },
+      { name: "苏浙精品四人套餐", price: "368", original: "568", discount: "6.5折" }
+    ]
+  },
+  {
+    name: "朱記小館 VERMILION HOUSE",
+    img: "../food-shops/zhuji-xiaoji.jpg",
+    meta: "距灵山胜境约900米 | ⭐4.7 超棒 | 创意中餐 | 人均 ¥78/人",
+    desc: "朱記小館（VERMILION HOUSE）是一家极具设计感的创意中式餐厅。正红色门面配以黑色框架，四盏红色灯笼上写着「朱記小館」四个大字，右侧可爱的猪形logo和英文标识增添了趣味性。门口台阶下方整齐排列着青色陶罐装饰。主打老手艺传承的创意菜品。",
+    tags: ["老手艺", "烟火气", "好味道", "创意中餐", "网红打卡"],
+    deals: [
+      { name: "朱記招牌创意双人餐", price: "198", original: "328", discount: "6折" },
+      { name: "老手艺传承四人宴", price: "428", original: "698", discount: "6.1折" }
+    ]
+  },
+  {
+    name: "屋里香私房菜",
+    img: "../food-shops/wulixiang-sifangcai.jpg",
+    meta: "距灵山胜境约650米 | ⭐4.5 超棒 | 私房菜·锡帮菜 | 人均 ¥55/人",
+    desc: "屋里香私房菜是一家夜间人气很旺的锡帮菜馆。巨大的黑底白字招牌在夜晚格外醒目，旁边挂着「醉美锡城」的宣传海报。店内主营无锡本地私房菜，菜品口味地道，是当地夜宵和聚会的热门去处。",
+    tags: ["醉美锡城", "锡帮菜", "夜宵", "人气旺"],
+    deals: [
+      { name: "锡帮特色双人餐", price: "138", original: "218", discount: "6.3折" },
+      { name: "屋里香招牌三人套餐", price: "228", original: "368", discount: "6.2折" }
+    ]
+  },
+  {
+    name: "许府牛 I miss niu",
+    img: "../food-shops/xufuniu.jpg",
+    meta: "距灵山胜境约3.5公里 | ⭐4.3 很好 | 牛杂火锅 | 人均 ¥72/人",
+    desc: "许府牛（I miss niu）是一家现代化的牛杂牛肉火锅店。金色招牌配以玻璃幕墙，店内装修时尚明亮，紫色墙面搭配暖黄色灯笼吊灯营造温馨氛围。主营各类牛杂和牛肉火锅，食材新鲜处理干净，汤底醇厚不膻，周年庆活动优惠力度大。",
+    tags: ["牛杂", "牛肉火锅", "周年庆", "时尚装修"],
+    deals: [
+      { name: "招牌牛杂双人火锅套餐", price: "158", original: "268", discount: "5.9折" },
+      { name: "极品牛肉拼盘四人锅", price: "328", original: "528", discount: "6.2折" }
+    ]
+  },
+  {
+    name: "吃个川川 · 猛火现炒",
+    img: "../food-shops/chige-chuanchuan.jpg",
+    meta: "距灵山胜境约4公里 | ⭐4.2 很好 | 川菜·麻辣 | 人均 ¥35/人",
+    desc: "吃个川川是一家川菜快餐店，红色招牌上的熊猫举着锅铲的logo十分可爱。「吃个川川 猛火现炒 川香麻辣」直接点明了店铺特色。主打各类川味小炒，猛火快炒保证镬气，麻辣过瘾又下饭，是爱吃辣的朋友不可错过的好店。",
+    tags: ["猛火现炒", "川香麻辣", "下饭", "熊猫IP", "平价川菜"],
+    deals: [
+      { name: "川味经典双人套餐", price: "68.8", original: "108", discount: "6.4折" },
+      { name: "麻辣诱惑三人餐", price: "118", original: "188", discount: "6.3折" }
+    ]
+  },
+  {
+    name: "悦君食府",
+    img: "../food-shops/yuejun-shifu.jpg",
+    meta: "距灵山胜境约1公里 | ⭐4.6 超棒 | 本帮菜 | 人均 ¥62/人",
+    desc: "悦君食府是一家格调雅致的本帮菜餐厅。「悦君食府」四个大字采用蓝色霓虹灯效果，现代感十足。店内装修简约大方，暖色调灯光营造舒适就餐氛围。菜品以本帮菜为主，口味纯正，服务周到，是商务宴请和朋友聚餐的理想选择。",
+    tags: ["本帮菜", "招聘服务", "聚餐首选", "雅致环境"],
+    deals: [
+      { name: "悦君招牌本帮双人餐", price: "148", original: "238", discount: "6.2折" },
+      { name: "悦君精品四人宴", price: "298", original: "468", discount: "6.4折" }
+    ]
+  },
+  {
+    name: "灵福缘私房菜",
+    img: "../food-shops/lingfuyuan.jpg",
+    meta: "距灵山胜境约458米 | ⭐4.5 超棒 | 私房菜 | 人均 ¥66/人 | 158号营业中",
+    desc: "灵福缘私房菜位于灵山景区旁，是一座三层高的传统风格建筑。黑底红字的招牌「灵福缘私房菜」十分醒目，门口两侧挂有纸质灯笼，LED屏显示「营业中」。一楼门厅有「158号」门牌和「营业中」立牌。主营太湖船菜和无锡私房菜，大闸蟹是季节限定招牌。",
+    tags: ["太湖银鱼羹", "凉拌鸭胗", "船菜", "大闸蟹", "灵山周边人气店"],
+    deals: [
+      { name: "灵福缘招牌套餐（含大闸蟹）", price: "298", original: "468", discount: "6.4折" },
+      { name: "经典私房菜双人餐", price: "144.84", subsidy: "省107.16" },
+      { name: "太湖船菜四人宴", price: "428", original: "698", discount: "6.1折" }
+    ]
+  }
+];
+
+// ========= 商家图片列表（用于轮播图和全屏预览） =========
+var shopImages = [
+  ["../food-shops/lijingxuan.jpg"],                                          // 0 丽景轩
+  ["../food-shops/yujia-sifangcai.jpg"],                                 // 1 渔家私房菜
+  ["../food-shops/jiajiajie.jpg"],                                        // 2 佳佳姐
+  ["../food-shops/tanghe-wuxi.jpg"],                                     // 3 汤和无锡菜
+  ["../food-shops/yuweifang.jpg"],                                       // 4 渔味坊
+  ["../food-shops/wukouzao.jpg"],                                        // 5 五口灶
+  ["../food-shops/maji-caifan.jpg"],                                    // 6 马姐菜饭
+  ["../food-shops/chengyuan-lingfuyuan.jpg"],                           // 7 澄园
+  ["../food-shops/xiaowuyue.jpg"],                                      // 8 小吴越
+  ["../food-shops/zhuji-xiaoji.jpg"],                                   // 9 朱記小館
+  ["../food-shops/wulixiang-sifangcai.jpg"],                             // 10 屋里香
+  ["../food-shops/xufuniu.jpg"],                                        // 11 许府牛
+  ["../food-shops/chige-chuanchuan.jpg"],                               // 12 吃个川川
+  ["../food-shops/yuejun-shifu.jpg"],                                  // 13 悦君食府
+  ["../food-shops/lingfuyuan.jpg"],                                    // 14 灵福缘
+];
+
+// ========= 轮播图当前索引 =========
+var carouselIndexes = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+
+// ========= 轮播图切换 =========
+function carouselPrev(shopIndex) {
+  var imgs = shopImages[shopIndex];
+  if (imgs.length <= 1) return;
+  if (carouselIndexes[shopIndex] > 0) {
+    carouselIndexes[shopIndex]--;
+  } else {
+    carouselIndexes[shopIndex] = imgs.length - 1;
+  }
+  updateCarousel(shopIndex);
+}
+function carouselNext(shopIndex) {
+  var imgs = shopImages[shopIndex];
+  if (imgs.length <= 1) return;
+  if (carouselIndexes[shopIndex] < imgs.length - 1) {
+    carouselIndexes[shopIndex]++;
+  } else {
+    carouselIndexes[shopIndex] = 0;
+  }
+  updateCarousel(shopIndex);
+}
+function updateCarousel(shopIndex) {
+  var track = document.getElementById('carousel-' + shopIndex);
+  if (!track) return;
+  var imgs = shopImages[shopIndex];
+  var idx = carouselIndexes[shopIndex];
+  track.style.transform = 'translateX(-' + (idx * 100) + '%)';
+  // 更新页码点
+  var dotsWrap = document.getElementById('dots-' + shopIndex);
+  if (dotsWrap) {
+    var html = '';
+    for (var i = 0; i < imgs.length; i++) {
+      html += '<button class="shop-carousel-dot' + (i === idx ? ' active' : '') + '" onclick="event.stopPropagation(); goToSlide(' + shopIndex + ',' + i + ')"></button>';
+    }
+    dotsWrap.innerHTML = html;
+  }
+}
+function goToSlide(shopIndex, slideIndex) {
+  carouselIndexes[shopIndex] = slideIndex;
+  updateCarousel(shopIndex);
+}
+
+// ========= 全屏图片预览 =========
+var ipCurrentShop = -1;
+var ipCurrentIndex = 0;
+
+function openImgPreview(shopIndex, imgIndex) {
+  ipCurrentShop = shopIndex;
+  ipCurrentIndex = imgIndex || 0;
+  renderImgPreview();
+  document.getElementById('imgPreviewOverlay').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+function closeImgPreview() {
+  document.getElementById('imgPreviewOverlay').classList.remove('active');
+  document.body.style.overflow = '';
+}
+function renderImgPreview() {
+  var imgArea = document.getElementById('ipImageArea');
+  var infoArea = document.getElementById('ipInfoArea');
+  if (ipCurrentShop < 0) return;
+  var imgs = shopImages[ipCurrentShop];
+  var imgSrc = imgs[ipCurrentIndex] || imgs[0];
+  imgArea.innerHTML = '<img src="' + imgSrc + '" alt="预览图">';
+  
+  // 渲染信息区
+  var shop = shops[ipCurrentShop];
+  var infoHtml = '';
+  infoHtml += '<div class="ip-info-name">' + shop.name + '</div>';
+  infoHtml += '<div class="ip-info-meta">' + shop.meta + '</div>';
+  infoHtml += '<div class="ip-info-desc">' + shop.desc + '</div>';
+  infoHtml += '<div class="ip-info-tags">';
+  if (shop.tags) {
+    shop.tags.forEach(function(t) {
+      infoHtml += '<span class="ip-info-tag">' + t + '</span>';
+    });
+  }
+  infoHtml += '</div>';
+  if (shop.deals && shop.deals.length > 0) {
+    infoHtml += '<div class="ip-info-deals">';
+    shop.deals.forEach(function(d) {
+      infoHtml += '<div class="ip-info-deal-row">';
+      infoHtml += '<span class="ip-info-deal-name">' + d.name + '</span>';
+      infoHtml += '<span class="ip-info-deal-price">¥' + d.price + '</span>';
+      infoHtml += '</div>';
+    });
+    infoHtml += '</div>';
+  }
+  infoArea.innerHTML = infoHtml;
+  
+  // 更新页码
+  var pageEl = document.getElementById('ipPage');
+  if (pageEl) {
+    pageEl.textContent = (ipCurrentIndex + 1) + ' / ' + imgs.length;
+  }
+  // 单图时隐藏箭头
+  var arrows = document.querySelectorAll('.ip-arrow');
+  if (imgs.length <= 1) {
+    arrows.forEach(function(a) { a.style.display = 'none'; });
+  } else {
+    arrows.forEach(function(a) { a.style.display = 'flex'; });
+  }
+}
+function imgPreviewPrev() {
+  var imgs = shopImages[ipCurrentShop];
+  if (!imgs || imgs.length <= 1) return;
+  if (ipCurrentIndex > 0) {
+    ipCurrentIndex--;
+  } else {
+    ipCurrentIndex = imgs.length - 1;
+  }
+  renderImgPreview();
+}
+function imgPreviewNext() {
+  var imgs = shopImages[ipCurrentShop];
+  if (!imgs || imgs.length <= 1) return;
+  if (ipCurrentIndex < imgs.length - 1) {
+    ipCurrentIndex++;
+  } else {
+    ipCurrentIndex = 0;
+  }
+  renderImgPreview();
+}
+
+
+
+function openModal(index) {
+  var shop = shops[index];
+  document.getElementById('modalImg').src = shop.img;
+  document.getElementById('modalImg').alt = shop.name;
+  document.getElementById('modalName').textContent = shop.name;
+  document.getElementById('modalMeta').innerHTML = shop.meta;
+  document.getElementById('modalDesc').textContent = shop.desc;
+
+  // 标签
+  var tagsHtml = '';
+  shop.tags.forEach(function(t) {
+    tagsHtml += '<span class="modal-tag">' + t + '</span>';
+  });
+  document.getElementById('modalTags').innerHTML = tagsHtml;
+
+  // 价格
+  var priceHtml = '';
+  if (shop.deals && shop.deals.forEach) {
+    shop.deals.forEach(function(d) {
+      priceHtml += '<div class="modal-deal-row">';
+      priceHtml += '<span class="modal-deal-name">' + d.name + '</span>';
+      priceHtml += '<span>';
+      if (d.original) {
+        priceHtml += '<span class="modal-deal-original">¥' + d.original + '</span>';
+      }
+      priceHtml += '<span class="modal-deal-price">¥' + d.price + '</span>';
+      if (d.discount) {
+        priceHtml += '<span class="modal-deal-discount">' + d.discount + '</span>';
+      }
+      if (d.subsidy) {
+        priceHtml += ' <small style="color:rgba(180,145,55,0.65);font-size:11px;">' + d.subsidy + '</small>';
+      }
+      priceHtml += '</span></div>';
+    });
+  }
+  document.getElementById('modalPriceArea').innerHTML = priceHtml;
+
+  document.getElementById('modalOverlay').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal(e) {
+  if (e && e.target !== e.currentTarget && !e.target.classList.contains('modal-close')) return;
+  document.getElementById('modalOverlay').classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+// ESC 关闭（支持两种弹窗）
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    var ipOverlay = document.getElementById('imgPreviewOverlay');
+    if (ipOverlay && ipOverlay.classList.contains('active')) {
+      closeImgPreview();
+      return;
+    }
+    var mdOverlay = document.getElementById('modalOverlay');
+    if (mdOverlay && mdOverlay.classList.contains('active')) {
+      closeModal({ target: mdOverlay, currentTarget: mdOverlay });
+    }
+  }
+});
+</script>
+
+<!-- 批量绑定卡片点击：文字区打开详情弹窗 -->
+<script>
+document.querySelectorAll('.shop-card-body').forEach(function(body, idx) {
+  body.addEventListener('click', function(e) {
+    // 如果点击的是按钮或内部可点击元素，不触发
+    if (e.target.closest('button')) return;
+    openModal(idx);
+  });
+});
+</script>
+
+</div><!-- /pov-inner -->
+</div><!-- /pov-outer -->
+
+<!-- ====== 弹窗 ====== -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal-content" onclick="event.stopPropagation()">
+    <button class="modal-close" onclick="closeModal(event)">✕</button>
+    <img class="modal-hero" id="modalImg" src="" alt="">
+    <div class="modal-body">
+      <div class="modal-name" id="modalName"></div>
+      <div class="modal-meta-row" id="modalMeta"></div>
+      <div class="modal-section-title">📝 简介</div>
+      <div class="modal-desc" id="modalDesc"></div>
+      <div class="modal-tags" id="modalTags"></div>
+      <div class="modal-section-title">💰 价格详情</div>
+      <div class="modal-price-area" id="modalPriceArea"></div>
+      <div class="modal-tip">💡 点击卡片外部区域可关闭弹窗</div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== 全屏图片预览弹窗 ====== -->
+<div class="img-preview-overlay" id="imgPreviewOverlay" onclick="event.stopPropagation(); closeImgPreview()">
+  <button class="ip-close" onclick="event.stopPropagation(); closeImgPreview()">✕</button>
+  <button class="ip-arrow prev" onclick="event.stopPropagation(); imgPreviewPrev()">‹</button>
+  <button class="ip-arrow next" onclick="event.stopPropagation(); imgPreviewNext()">›</button>
+  <div class="ip-container" onclick="closeImgPreview()">
+    <div class="ip-image-area" id="ipImageArea"></div>
+    <div class="ip-info-area" id="ipInfoArea"></div>
+  </div>
+  <div class="ip-page" id="ipPage"></div>
+</div>
+
+</body>
+</html>

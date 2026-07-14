@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>灵山胜境 · 景区导览</title>
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <!-- Leaflet Routing Machine CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
+
+  <style>
+    /* ===================== 全局重置 ===================== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      width: 100%; height: 100%;
+      overflow: hidden;
+      font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      background: #1a1a2e;
+    }
+
+    /* ===================== 地图容器 ===================== */
+    #map {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+
+    /* ===================== 顶部标题栏 ===================== */
+    #topbar {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 56px;
+      background: linear-gradient(180deg, rgba(20,15,10,0.92) 0%, rgba(20,15,10,0) 100%);
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      z-index: 1000;
+      pointer-events: none;
+    }
+    #topbar h1 {
+      color: #f5e6c8;
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 4px;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+    }
+
+    /* ===================== 右侧控制按钮组 ===================== */
+    #controls {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 1000;
+    }
+    .ctrl-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+      transition: transform 0.15s, box-shadow 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .ctrl-btn:active { transform: scale(0.9); }
+    #btn-locate {
+      background: linear-gradient(135deg, #3498db, #2980b9);
+      color: #fff;
+    }
+    #btn-locate.locating {
+      background: linear-gradient(135deg, #27ae60, #219a52);
+      animation: pulse 1.5s infinite;
+    }
+    #btn-search {
+      background: linear-gradient(135deg, #8B7355, #A0522D);
+      color: #fff;
+    }
+    #btn-layers {
+      background: rgba(255,255,255,0.92);
+      color: #555;
+      font-size: 18px;
+    }
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 4px 16px rgba(39,174,96,0.4); }
+      50% { box-shadow: 0 4px 24px rgba(39,174,96,0.8); }
+    }
+
+    /* ===================== 定位状态提示 ===================== */
+    #gps-status {
+      position: absolute;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(20,15,10,0.85);
+      color: #f5e6c8;
+      font-size: 13px;
+      padding: 8px 20px;
+      border-radius: 20px;
+      z-index: 1000;
+      pointer-events: none;
+      white-space: nowrap;
+      display: none;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+    }
+    #gps-status.show { display: block; }
+
+    /* ===================== 搜索面板 ===================== */
+    #search-panel {
+      position: absolute;
+      top: 0; right: 0;
+      width: 340px;
+      height: 100%;
+      background: #fffef8;
+      z-index: 2000;
+      display: flex;
+      flex-direction: column;
+      transform: translateX(100%);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: -4px 0 24px rgba(0,0,0,0.25);
+    }
+    #search-panel.open { transform: translateX(0); }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      background: linear-gradient(135deg, #8B7355, #A0522D);
+      flex-shrink: 0;
+    }
+    .panel-title {
+      color: #fff;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 3px;
+    }
+    .panel-close {
+      width: 36px; height: 36px;
+      background: rgba(255,255,255,0.2);
+      border: none;
+      border-radius: 50%;
+      color: #fff;
+      font-size: 18px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .panel-close:hover { background: rgba(255,255,255,0.35); }
+
+    .search-box {
+      padding: 14px 16px;
+      background: #f5f2ed;
+      flex-shrink: 0;
+    }
+    .search-input-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #fff;
+      border-radius: 24px;
+      padding: 10px 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .search-input-wrap input {
+      flex: 1;
+      border: none;
+      outline: none;
+      font-size: 14px;
+      color: #333;
+      background: transparent;
+    }
+    .search-input-wrap span { font-size: 16px; color: #999; }
+
+    .spot-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px 12px 24px;
+    }
+    .spot-list::-webkit-scrollbar { width: 4px; }
+    .spot-list::-webkit-scrollbar-thumb { background: #ddd; border-radius: 2px; }
+
+    .spot-item {
+      display: flex;
+      align-items: center;
+      padding: 14px 14px;
+      background: #faf8f5;
+      border-radius: 14px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      gap: 14px;
+      transition: background 0.15s, transform 0.1s;
+    }
+    .spot-item:hover { background: #f0ebe3; }
+    .spot-item:active { transform: scale(0.98); }
+
+    .spot-icon {
+      width: 42px; height: 42px;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    .spot-info { flex: 1; min-width: 0; }
+    .spot-name {
+      font-size: 15px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 4px;
+    }
+    .spot-desc {
+      font-size: 12px;
+      color: #888;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .spot-nav {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, #8B7355, #A0522D);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff;
+      font-size: 14px;
+      flex-shrink: 0;
+      border: none;
+      cursor: pointer;
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 11px;
+      margin-left: 6px;
+    }
+    .tag-core { background: rgba(227,112,38,0.12); color: #e37026; }
+    .tag-culture { background: rgba(114,93,210,0.1); color: #725dd2; }
+    .tag-facility { background: rgba(52,152,219,0.1); color: #3498db; }
+    .tag-service { background: rgba(39,174,96,0.1); color: #27ae60; }
+    .tag-experience { background: rgba(155,89,182,0.1); color: #9b59b6; }
+
+    .no-result {
+      text-align: center;
+      color: #ccc;
+      padding: 60px 0;
+      font-size: 14px;
+    }
+
+    /* ===================== 景点详情卡片 ===================== */
+    #detail-card {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      background: #fffef8;
+      border-radius: 24px 24px 0 0;
+      z-index: 2000;
+      transform: translateY(100%);
+      transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 -6px 30px rgba(0,0,0,0.2);
+      max-height: 75vh;
+      display: flex;
+      flex-direction: column;
+    }
+    #detail-card.open { transform: translateY(0); }
+
+    .card-handle {
+      width: 40px; height: 4px;
+      background: #e0d8cc;
+      border-radius: 2px;
+      margin: 12px auto 0;
+      flex-shrink: 0;
+    }
+    .card-header {
+      padding: 16px 20px 12px;
+      background: linear-gradient(135deg, #8B7355, #A0522D);
+      flex-shrink: 0;
+    }
+    .card-name {
+      font-size: 20px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 2px;
+    }
+    .card-tag-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 6px;
+    }
+    .card-tag {
+      background: rgba(255,255,255,0.25);
+      color: #fff;
+      font-size: 12px;
+      padding: 3px 12px;
+      border-radius: 12px;
+    }
+    .card-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 20px;
+    }
+    .card-desc {
+      font-size: 14px;
+      color: #555;
+      line-height: 1.6;
+      margin-bottom: 16px;
+    }
+    .card-section {
+      background: #f5f2ed;
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+    .card-section-label {
+      font-size: 12px;
+      color: #a0522d;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    .card-section-value {
+      font-size: 13px;
+      color: #555;
+      line-height: 1.5;
+    }
+    .card-actions {
+      display: flex;
+      gap: 12px;
+      padding: 14px 20px;
+      padding-bottom: calc(14px + env(safe-area-inset-bottom));
+      border-top: 1px solid #eee;
+      flex-shrink: 0;
+    }
+    .card-btn {
+      flex: 1;
+      height: 48px;
+      border-radius: 24px;
+      border: none;
+      font-size: 15px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: transform 0.1s;
+    }
+    .card-btn:active { transform: scale(0.97); }
+    .card-btn.secondary { background: #f0ebe3; color: #666; }
+    .card-btn.primary {
+      background: linear-gradient(135deg, #8B7355, #A0522D);
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(160,82,45,0.35);
+    }
+
+    /* ===================== 路线信息条 ===================== */
+    #route-bar {
+      position: absolute;
+      top: 68px; left: 50%; transform: translateX(-50%);
+      background: rgba(20,15,10,0.9);
+      color: #f5e6c8;
+      font-size: 13px;
+      padding: 10px 20px;
+      border-radius: 20px;
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      gap: 16px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+      white-space: nowrap;
+    }
+    #route-bar.show { display: flex; }
+    #btn-clear-route {
+      background: rgba(255,255,255,0.15);
+      border: none;
+      color: #f5e6c8;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    /* ===================== 遮罩层 ===================== */
+    #overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.35);
+      z-index: 1500;
+      display: none;
+    }
+    #overlay.show { display: block; }
+
+    /* ===================== Leaflet 自定义标记覆盖 ===================== */
+    .custom-marker {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+    }
+    .marker-bubble {
+      background: #fff;
+      border-radius: 10px;
+      padding: 4px 8px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #333;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.25);
+      white-space: nowrap;
+      border: 2px solid #A0522D;
+    }
+    .marker-pin {
+      width: 0; height: 0;
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-top: 8px solid #A0522D;
+      margin-top: -1px;
+    }
+    .marker-bubble.core { border-color: #e37026; }
+    .marker-pin.core { border-top-color: #e37026; }
+    .marker-bubble.culture { border-color: #725dd2; }
+    .marker-pin.culture { border-top-color: #725dd2; }
+    .marker-bubble.facility { border-color: #3498db; }
+    .marker-pin.facility { border-top-color: #3498db; }
+    .marker-bubble.service { border-color: #27ae60; }
+    .marker-pin.service { border-top-color: #27ae60; }
+    .marker-bubble.experience { border-color: #9b59b6; }
+    .marker-pin.experience { border-top-color: #9b59b6; }
+
+    /* 用户位置标记 */
+    .user-marker {
+      width: 20px; height: 20px;
+      background: #2980b9;
+      border: 3px solid #fff;
+      border-radius: 50%;
+      box-shadow: 0 0 0 4px rgba(41,128,185,0.3);
+      animation: userPulse 2s infinite;
+    }
+    @keyframes userPulse {
+      0%, 100% { box-shadow: 0 0 0 4px rgba(41,128,185,0.3); }
+      50% { box-shadow: 0 0 0 10px rgba(41,128,185,0.1); }
+    }
+
+    /* ===================== 图例 ===================== */
+    #legend {
+      position: absolute;
+      bottom: 60px;
+      right: 16px;
+      background: rgba(255,252,242,0.95);
+      border-radius: 12px;
+      padding: 10px 14px;
+      z-index: 1000;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+      font-size: 12px;
+    }
+    .legend-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+    .legend-row:last-child { margin-bottom: 0; }
+    .legend-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .legend-label { color: #555; }
+
+    /* ===================== 瓦片加载中 ===================== */
+    #tile-loading {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(20,15,10,0.85);
+      color: #f5e6c8;
+      padding: 14px 28px;
+      border-radius: 16px;
+      font-size: 14px;
+      z-index: 3000;
+      display: none;
+    }
+    #tile-loading.show { display: block; }
+
+    /* ===================== 响应式：移动端 ===================== */
+    @media (max-width: 480px) {
+      #search-panel { width: 100%; }
+      #detail-card { border-radius: 20px 20px 0 0; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- 地图容器 -->
+<div id="map"></div>
+
+<!-- 顶部标题栏 -->
+<div id="topbar">
+  <h1>灵山胜境</h1>
+</div>
+
+<!-- 右侧控制按钮 -->
+<div id="controls">
+  <button class="ctrl-btn" id="btn-locate" title="GPS定位">📍</button>
+  <button class="ctrl-btn" id="btn-search" title="搜索景点">🔍</button>
+  <button class="ctrl-btn" id="btn-layers" title="图层切换">🗺</button>
+</div>
+
+<!-- 图例 -->
+<div id="legend">
+  <div class="legend-row"><div class="legend-dot" style="background:#e37026"></div><span class="legend-label">核心景点</span></div>
+  <div class="legend-row"><div class="legend-dot" style="background:#725dd2"></div><span class="legend-label">文化古迹</span></div>
+  <div class="legend-row"><div class="legend-dot" style="background:#3498db"></div><span class="legend-label">服务设施</span></div>
+  <div class="legend-row"><div class="legend-dot" style="background:#27ae60"></div><span class="legend-label">餐饮购物</span></div>
+  <div class="legend-row"><div class="legend-dot" style="background:#9b59b6"></div><span class="legend-label">祈福体验</span></div>
+</div>
+
+<!-- 路线信息条 -->
+<div id="route-bar">
+  <span id="route-info">步行路线</span>
+  <button id="btn-clear-route">× 清除路线</button>
+</div>
+
+<!-- GPS 状态提示 -->
+<div id="gps-status"></div>
+
+<!-- 瓦片加载提示 -->
+<div id="tile-loading">地图加载中...</div>
+
+<!-- 遮罩层 -->
+<div id="overlay"></div>
+
+<!-- 搜索面板 -->
+<div id="search-panel">
+  <div class="panel-header">
+    <span class="panel-title">景点搜索</span>
+    <button class="panel-close" id="btn-close-search">✕</button>
+  </div>
+  <div class="search-box">
+    <div class="search-input-wrap">
+      <span>🔍</span>
+      <input type="text" id="search-input" placeholder="请输入景点名称..." autocomplete="off" />
+    </div>
+  </div>
+  <div class="spot-list" id="spot-list"></div>
+</div>
+
+<!-- 景点详情卡片 -->
+<div id="detail-card">
+  <div class="card-handle"></div>
+  <div class="card-header">
+    <div class="card-name" id="card-name"></div>
+    <div class="card-tag-row">
+      <span class="card-tag" id="card-tag"></span>
+    </div>
+  </div>
+  <div class="card-body">
+    <p class="card-desc" id="card-desc"></p>
+    <div class="card-section">
+      <div class="card-section-label">📍 位置信息</div>
+      <div class="card-section-value" id="card-location"></div>
+    </div>
+    <div class="card-section">
+      <div class="card-section-label">💡 游览建议</div>
+      <div class="card-section-value" id="card-tips"></div>
+    </div>
+  </div>
+  <div class="card-actions">
+    <button class="card-btn secondary" id="btn-close-detail">返回地图</button>
+    <button class="card-btn primary" id="btn-navigate">▶ 步行导航</button>
+  </div>
+</div>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+// =====================================================
+//  配置区 —— 根据实际情况修改
+// =====================================================
+const CONFIG = {
+  // 手绘瓦片地图 URL 模板
+  // 当你准备好瓦片后，把这里改为实际路径，例如：
+  //   本地文件: './tiles/{z}/{x}/{y}.png'
+  //   本地服务: 'http://localhost:8888/tiles/{z}/{x}/{y}.png'
+  // 暂时使用 OpenStreetMap 作为占位底图，不做任何实际请求到付费API
+  TILE_URL: './tiles/{z}/{x}/{y}.png',
+  TILE_FALLBACK_URL: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+  TILE_ATTRIBUTION: '&copy; 灵山胜境手绘地图',
+
+  // 景区中心坐标（WGS84）
+  CENTER_LAT: 31.4205,
+  CENTER_LNG: 120.1450,
+  DEFAULT_ZOOM: 17,
+  MIN_ZOOM: 15,
+  MAX_ZOOM: 20,
+
+  // 本地 OSRM 步行路线服务地址
+  // 运行 OSRM 后改为实际地址，例如 'http://localhost:5000'
+  OSRM_URL: 'http://localhost:5000',
+
+  // GPS 精度阈值（米），超过此值不更新
+  GPS_ACCURACY_THRESHOLD: 100,
+};
+
+// =====================================================
+//  景点数据
+// =====================================================
+const SPOTS = [
+  {
+    id: 'buddha', name: '灵山大佛', tag: '核心景点', tagClass: 'core', icon: '🗿',
+    lat: 31.4225, lng: 120.1448,
+    desc: '88米高露天青铜释迦牟尼立像，灵山胜境标志性景观',
+    fullDesc: '灵山大佛是灵山胜境的核心景观，高88米，由1560块青铜壁板拼装而成。大佛慈颜微笑，广视众生。右手"施无畏印"代表除却痛苦，左手"与愿印"代表给予快乐。1997年落成，是中国五方五佛之东方大佛。',
+    location: '景区北部中心位置，从检票口步行约15分钟可达',
+    tips: '建议上午参观，人少且光线最佳；可抱佛脚祈福，寓意好运连连',
+  },
+  {
+    id: 'jiulong', name: '九龙灌浴', tag: '核心景点', tagClass: 'core', icon: '🐉',
+    lat: 31.4215, lng: 120.1445,
+    desc: '国内最大规模动态音乐喷泉铜雕，每整点表演',
+    fullDesc: '九龙灌浴是国内最大规模的音乐喷泉动态铜雕。高达7.2米的莲花铜像矗立于水池中央，每整点表演时，莲花缓缓绽放，九龙同时喷水，场面极为壮观。',
+    location: '位于景区中轴线，杏坛广场北侧',
+    tips: '⭐ 整点开放表演（10:00-16:00），每场约8分钟！建议提前5分钟占位',
+  },
+  {
+    id: 'fangong', name: '灵山梵宫', tag: '核心景点', tagClass: 'core', icon: '🏛',
+    lat: 31.4208, lng: 120.1468,
+    desc: '世界佛教论坛永久会址，金碧辉煌的艺术殿堂',
+    fullDesc: '灵山梵宫是世界佛教论坛的永久会址，内部有巨幅琉璃浮雕《华藏世界》、精美的东阳木雕、敦煌壁画风格彩绘等珍贵艺术品。每天还有《灵山吉祥颂》大型情景演出。',
+    location: '景区东部中心区域',
+    tips: '⭐ 必看景点！禁止闪光灯拍照',
+  },
+  {
+    id: 'wuyin', name: '五印坛城', tag: '核心景点', tagClass: 'core', icon: '🕌',
+    lat: 31.4198, lng: 120.1462,
+    desc: '藏式佛教艺术殿堂，展示五方佛五种手印',
+    fullDesc: '五印坛城以藏族文化为主题，外观宏伟壮观，内部装饰华丽，展示了五方佛的五种手印。内部有精美的唐卡、壁画和造像，色彩斑斓。',
+    location: '景区南部偏东位置',
+    tips: '内部装修极其精美；注意保持安静，禁止触摸壁画',
+  },
+  {
+    id: 'xiangfu', name: '祥符禅寺', tag: '文化古迹', tagClass: 'culture', icon: '⛩',
+    lat: 31.4218, lng: 120.1452,
+    desc: '千年古刹，始建于唐贞观年间',
+    fullDesc: '祥符禅寺原名"法华院"，始建于唐贞观年间，距今已有一千三百余年历史。现寺内有大雄宝殿、藏经楼等建筑，是灵山胜境中历史最悠久的佛教寺院。',
+    location: '杏坛广场东侧',
+    tips: '可入内参拜，感受千年古刹氛围；注意保持安静肃穆',
+  },
+  {
+    id: 'palm', name: '灵山佛手', tag: '核心景点', tagClass: 'core', icon: '🙏',
+    lat: 31.4222, lng: 120.1443,
+    desc: '与灵山大佛同比例复制的巨型佛手，高11.7米',
+    fullDesc: '灵山佛手为灵山大佛右手的复制件，高11.7米，宽5.5米，手指直径1米。佛手的形状为"施无畏印"，游客可以抱一抱佛手，祈求平安吉祥。',
+    location: '位于灵山大佛下方左侧区域',
+    tips: '可与佛手合影留念，热门拍照打卡点',
+  },
+  {
+    id: 'xingtan', name: '杏坛广场', tag: '集散广场', tagClass: 'facility', icon: '🏟',
+    lat: 31.4212, lng: 120.1448,
+    desc: '景区核心集散休息广场，连接各主要景点的枢纽',
+    fullDesc: '杏坛广场位于灵山脚下，是景区的中心集散地。广场开阔宽敞，四周环绕着祥符禅寺、九龙灌浴等核心景点。',
+    location: '灵山脚下中心区域，菩提大道北端',
+    tips: '适合团队集合、拍照留念；有观光车站点',
+  },
+  {
+    id: 'qifu', name: '祈福普缘', tag: '祈福体验', tagClass: 'experience', icon: '🎋',
+    lat: 31.4202, lng: 120.1465,
+    desc: '祈福许愿场所，挂福牌系丝带寄托美好愿望',
+    fullDesc: '祈福普缘是一处供游客许愿祈福的特色区域。在这里可以挂上写满愿望的祈福牌、系上红丝带，将美好的祝愿留在灵山圣地。',
+    location: '五印坛城北侧，近曼飞龙塔',
+    tips: '可在此处挂祈福牌、系红丝带',
+  },
+  {
+    id: 'manfeilong', name: '曼飞龙塔', tag: '文化古迹', tagClass: 'culture', icon: '🗼',
+    lat: 31.4205, lng: 120.1472,
+    desc: '傣族风格的群塔建筑，典型的南传佛教佛塔造型',
+    fullDesc: '曼飞龙塔原型来自云南西双版纳，是一座典型的南传佛教群塔。主塔居中，八座小塔环绕，塔身洁白，展现了傣族建筑的独特魅力。',
+    location: '灵山梵宫东南侧',
+    tips: '典型的南传佛教建筑风格，与梵宫形成汉藏傣三族佛教建筑对比',
+  },
+  {
+    id: 'puti-dadao', name: '菩提大道', tag: '主干道', tagClass: 'facility', icon: '🛤',
+    lat: 31.4195, lng: 120.1448,
+    desc: '通往核心景区的中轴主干道，全长约800米',
+    fullDesc: '菩提大道是灵山胜境的主轴通道，南起检票口，北至杏坛广场。道路两侧精心布置了园林景观、石雕小品和文化标识牌。',
+    location: '连接入口与杏坛广场的中轴主干道',
+    tips: '沿途有各种小吃摊位和纪念品商店',
+  },
+  {
+    id: 'futan', name: '梵足坛', tag: '入口广场', tagClass: 'facility', icon: '🚶',
+    lat: 31.4183, lng: 120.1448,
+    desc: '景区入口处的佛教文化主题广场，菩提大道起点',
+    fullDesc: '梵足坛位于景区正门入口内侧，是游客进入灵山后的第一个重要节点。',
+    location: '菩提大道南端，紧邻检票口',
+    tips: '刚进景区可在此稍作停留，规划游览路线',
+  },
+  {
+    id: 'ticket-gate', name: '检票口', tag: '出入口', tagClass: 'facility', icon: '🎫',
+    lat: 31.4178, lng: 120.1448,
+    desc: '景区主出入口，由此进入灵山圣境',
+    fullDesc: '景区主出入口，由此进入灵山圣境。',
+    location: '景区最南侧正门位置',
+    tips: '提前准备好电子或纸质门票；旺季排队时间较长建议早到',
+  },
+  {
+    id: 'sushi', name: '蔬食馆', tag: '餐饮服务', tagClass: 'service', icon: '🍜',
+    lat: 31.4213, lng: 120.1455,
+    desc: '素食餐厅，提供特色素斋美食',
+    fullDesc: '蔬食馆提供各式精致素斋餐品，融合了传统佛教饮食与现代烹饪技艺。',
+    location: '景区中部偏东，观光车线路沿线',
+    tips: '提供特色素斋美食，推荐灵山素面和素包子',
+  },
+  {
+    id: 'tourist-center', name: '游客中心', tag: '综合服务', tagClass: 'service', icon: 'ℹ',
+    lat: 31.4182, lng: 120.1450,
+    desc: '景区综合服务中心，提供咨询、导览、寄存等服务',
+    fullDesc: '游客中心提供旅游咨询、导游预约、行李寄存、轮椅租赁、失物招领等各类服务，同时也可领取免费的景区导览图。',
+    location: '景区出口假日广场西侧，近导游服务站',
+    tips: '首次游览建议先来领取导览图并租借讲解器',
+  },
+];
+
+// =====================================================
+//  应用状态
+// =====================================================
+const state = {
+  map: null,
+  tileLayer: null,
+  userMarker: null,
+  userCircle: null,
+  routeLayer: null,
+  watchId: null,
+  userLat: null,
+  userLng: null,
+  activeSpot: null,
+  isSearchOpen: false,
+  useFallbackTile: false,
+};
+
+// =====================================================
+//  初始化地图
+// =====================================================
+function initMap() {
+  state.map = L.map('map', {
+    center: [CONFIG.CENTER_LAT, CONFIG.CENTER_LNG],
+    zoom: CONFIG.DEFAULT_ZOOM,
+    minZoom: CONFIG.MIN_ZOOM,
+    maxZoom: CONFIG.MAX_ZOOM,
+    zoomControl: false,           // 隐藏默认缩放按钮
+    attributionControl: true,
+  });
+
+  // 添加缩放控件到左下角
+  L.control.zoom({ position: 'bottomleft' }).addTo(state.map);
+
+  // 加载自制瓦片底图
+  loadTileLayer();
+
+  // 添加景点标记
+  addSpotMarkers();
+
+  // 点击地图空白处关闭详情卡片
+  state.map.on('click', () => {
+    closeDetailCard();
+  });
+}
+
+// =====================================================
+//  瓦片底图加载（优先自制，失败自动切 OSM）
+// =====================================================
+function loadTileLayer() {
+  const tileLoading = document.getElementById('tile-loading');
+  tileLoading.classList.add('show');
+
+  if (state.tileLayer) {
+    state.map.removeLayer(state.tileLayer);
+  }
+
+  const url = state.useFallbackTile ? CONFIG.TILE_FALLBACK_URL : CONFIG.TILE_URL;
+
+  state.tileLayer = L.tileLayer(url, {
+    attribution: state.useFallbackTile
+      ? '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+      : CONFIG.TILE_ATTRIBUTION,
+    maxZoom: CONFIG.MAX_ZOOM,
+    tileSize: 256,
+    errorTileUrl: '',
+  });
+
+  // 监听瓦片加载失败：自动切换到 OSM
+  state.tileLayer.on('tileerror', () => {
+    if (!state.useFallbackTile) {
+      state.useFallbackTile = true;
+      showStatus('自制瓦片未找到，已切换至 OpenStreetMap 底图');
+      loadTileLayer();
+    }
+  });
+
+  state.tileLayer.on('load', () => {
+    tileLoading.classList.remove('show');
+  });
+
+  state.tileLayer.addTo(state.map);
+
+  // 3秒后如果还没加载完就隐藏提示
+  setTimeout(() => tileLoading.classList.remove('show'), 3000);
+}
+
+// =====================================================
+//  景点标记
+// =====================================================
+function addSpotMarkers() {
+  SPOTS.forEach(spot => {
+    const icon = L.divIcon({
+      className: 'custom-marker',
+      html: `<div class="marker-bubble ${spot.tagClass}">${spot.icon} ${spot.name}</div><div class="marker-pin ${spot.tagClass}"></div>`,
+      iconAnchor: [0, 32],
+      iconSize: null,
+    });
+
+    const marker = L.marker([spot.lat, spot.lng], { icon })
+      .addTo(state.map);
+
+    marker.on('click', (e) => {
+      L.DomEvent.stopPropagation(e);
+      openDetailCard(spot);
+      state.map.panTo([spot.lat, spot.lng]);
+    });
+  });
+}
+
+// =====================================================
+//  GPS 定位
+// =====================================================
+function startLocate() {
+  const btn = document.getElementById('btn-locate');
+
+  if (!navigator.geolocation) {
+    showStatus('您的浏览器不支持 GPS 定位');
+    return;
+  }
+
+  if (state.watchId !== null) {
+    // 已在定位中 → 停止
+    navigator.geolocation.clearWatch(state.watchId);
+    state.watchId = null;
+    btn.classList.remove('locating');
+    btn.textContent = '📍';
+    if (state.userMarker) {
+      state.map.removeLayer(state.userMarker);
+      state.map.removeLayer(state.userCircle);
+      state.userMarker = null;
+      state.userCircle = null;
+    }
+    showStatus('已停止定位');
+    return;
+  }
+
+  btn.classList.add('locating');
+  btn.textContent = '🔵';
+  showStatus('正在获取 GPS 位置...');
+
+  state.watchId = navigator.geolocation.watchPosition(
+    (pos) => {
+      const { latitude, longitude, accuracy } = pos.coords;
+
+      state.userLat = latitude;
+      state.userLng = longitude;
+
+      // 更新或创建用户位置标记
+      if (state.userMarker) {
+        state.userMarker.setLatLng([latitude, longitude]);
+        state.userCircle.setLatLng([latitude, longitude]);
+        state.userCircle.setRadius(accuracy);
+      } else {
+        const userIcon = L.divIcon({
+          className: '',
+          html: '<div class="user-marker"></div>',
+          iconSize: [20, 20],
+          iconAnchor: [10, 10],
+        });
+        state.userMarker = L.marker([latitude, longitude], { icon: userIcon }).addTo(state.map);
+        state.userCircle = L.circle([latitude, longitude], {
+          radius: accuracy,
+          color: '#2980b9',
+          fillColor: '#3498db',
+          fillOpacity: 0.1,
+          weight: 1,
+        }).addTo(state.map);
+
+        state.map.setView([latitude, longitude], CONFIG.DEFAULT_ZOOM);
+      }
+
+      showStatus(`已定位，精度约 ${Math.round(accuracy)} 米`, 2000);
+    },
+    (err) => {
+      btn.classList.remove('locating');
+      btn.textContent = '📍';
+      state.watchId = null;
+      const messages = {
+        1: 'GPS 权限被拒绝，请在浏览器设置中开启定位权限',
+        2: 'GPS 信号不可用',
+        3: 'GPS 定位超时，请重试',
+      };
+      showStatus(messages[err.code] || 'GPS 定位失败');
+    },
+    {
+      enableHighAccuracy: true,
+      timeout: 15000,
+      maximumAge: 0,
+    }
+  );
+}
+
+// =====================================================
+//  OSRM 步行路线规划
+// =====================================================
+async function planRoute(destSpot) {
+  if (state.userLat === null || state.userLng === null) {
+    showStatus('请先开启 GPS 定位，才能规划路线');
+    return;
+  }
+
+  // 清除上一条路线
+  clearRoute();
+
+  showStatus('正在规划步行路线...');
+
+  const url = `${CONFIG.OSRM_URL}/route/v1/foot/` +
+    `${state.userLng},${state.userLat};${destSpot.lng},${destSpot.lat}` +
+    `?overview=full&geometries=geojson&steps=false`;
+
+  try {
+    const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+
+    if (!data.routes || data.routes.length === 0) {
+      showStatus('未找到步行路线');
+      return;
+    }
+
+    const route = data.routes[0];
+    const coords = route.geometry.coordinates.map(([lng, lat]) => [lat, lng]);
+
+    // 绘制路线
+    state.routeLayer = L.polyline(coords, {
+      color: '#e37026',
+      weight: 5,
+      opacity: 0.85,
+      dashArray: '10, 6',
+      lineJoin: 'round',
+    }).addTo(state.map);
+
+    state.map.fitBounds(state.routeLayer.getBounds(), { padding: [40, 40] });
+
+    // 显示路线信息
+    const dist = route.distance >= 1000
+      ? `${(route.distance / 1000).toFixed(1)} 公里`
+      : `${Math.round(route.distance)} 米`;
+    const mins = Math.round(route.duration / 60);
+
+    document.getElementById('route-info').textContent =
+      `📍 步行至 ${destSpot.name} · ${dist} · 约 ${mins} 分钟`;
+    document.getElementById('route-bar').classList.add('show');
+
+  } catch (err) {
+    if (err.name === 'TimeoutError') {
+      showStatus('OSRM 路线服务未响应，请检查本地服务是否已启动');
+    } else {
+      showStatus(`路线规划失败：${err.message}`);
+    }
+    console.error('[OSRM]', err);
+  }
+}
+
+function clearRoute() {
+  if (state.routeLayer) {
+    state.map.removeLayer(state.routeLayer);
+    state.routeLayer = null;
+  }
+  document.getElementById('route-bar').classList.remove('show');
+}
+
+// =====================================================
+//  详情卡片
+// =====================================================
+function openDetailCard(spot) {
+  state.activeSpot = spot;
+  document.getElementById('card-name').textContent = spot.name;
+  document.getElementById('card-tag').textContent = spot.tag;
+  document.getElementById('card-desc').textContent = spot.fullDesc || spot.desc;
+  document.getElementById('card-location').textContent = spot.location || '—';
+  document.getElementById('card-tips').textContent = spot.tips || '—';
+  document.getElementById('detail-card').classList.add('open');
+}
+
+function closeDetailCard() {
+  document.getElementById('detail-card').classList.remove('open');
+  state.activeSpot = null;
+}
+
+// =====================================================
+//  搜索面板
+// =====================================================
+function openSearch() {
+  state.isSearchOpen = true;
+  document.getElementById('search-panel').classList.add('open');
+  document.getElementById('overlay').classList.add('show');
+  renderSpotList('');
+  setTimeout(() => document.getElementById('search-input').focus(), 350);
+}
+
+function closeSearch() {
+  state.isSearchOpen = false;
+  document.getElementById('search-panel').classList.remove('open');
+  document.getElementById('overlay').classList.remove('show');
+  document.getElementById('search-input').value = '';
+}
+
+function renderSpotList(keyword) {
+  const kw = keyword.trim().toLowerCase();
+  const filtered = kw
+    ? SPOTS.filter(s => s.name.includes(kw) || s.desc.includes(kw) || s.tag.includes(kw))
+    : SPOTS;
+
+  const container = document.getElementById('spot-list');
+
+  if (filtered.length === 0) {
+    container.innerHTML = '<div class="no-result">未找到匹配的景点 🔍</div>';
+    return;
+  }
+
+  container.innerHTML = filtered.map(spot => `
+    <div class="spot-item" data-id="${spot.id}">
+      <div class="spot-icon" style="background:${tagColor(spot.tagClass)}20">
+        <span>${spot.icon}</span>
+      </div>
+      <div class="spot-info">
+        <div class="spot-name">${spot.name}<span class="tag tag-${spot.tagClass}">${spot.tag}</span></div>
+        <div class="spot-desc">${spot.desc}</div>
+      </div>
+      <button class="spot-nav" data-id="${spot.id}" title="导航">▶</button>
+    </div>
+  `).join('');
+
+  // 点击景点卡片 → 定位到地图 + 显示详情
+  container.querySelectorAll('.spot-item').forEach(el => {
+    el.addEventListener('click', (e) => {
+      if (e.target.classList.contains('spot-nav')) return;
+      const spot = SPOTS.find(s => s.id === el.dataset.id);
+      if (!spot) return;
+      closeSearch();
+      state.map.setView([spot.lat, spot.lng], 18);
+      openDetailCard(spot);
+    });
+  });
+
+  // 点击导航按钮 → 直接规划路线
+  container.querySelectorAll('.spot-nav').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const spot = SPOTS.find(s => s.id === btn.dataset.id);
+      if (!spot) return;
+      closeSearch();
+      planRoute(spot);
+    });
+  });
+}
+
+function tagColor(tagClass) {
+  const colors = {
+    core: '#e37026', culture: '#725dd2',
+    facility: '#3498db', service: '#27ae60', experience: '#9b59b6'
+  };
+  return colors[tagClass] || '#999';
+}
+
+// =====================================================
+//  图层切换（在自制瓦片和 OSM 之间切换）
+// =====================================================
+function toggleLayer() {
+  state.useFallbackTile = !state.useFallbackTile;
+  loadTileLayer();
+  showStatus(state.useFallbackTile ? '已切换至 OpenStreetMap 底图' : '已切换至灵山手绘瓦片底图');
+}
+
+// =====================================================
+//  状态提示
+// =====================================================
+function showStatus(msg, duration = 3000) {
+  const el = document.getElementById('gps-status');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(el._timer);
+  if (duration > 0) {
+    el._timer = setTimeout(() => el.classList.remove('show'), duration);
+  }
+}
+
+// =====================================================
+//  事件绑定
+// =====================================================
+function bindEvents() {
+  // GPS 定位按钮
+  document.getElementById('btn-locate').addEventListener('click', startLocate);
+
+  // 搜索按钮
+  document.getElementById('btn-search').addEventListener('click', openSearch);
+  document.getElementById('btn-close-search').addEventListener('click', closeSearch);
+
+  // 图层切换
+  document.getElementById('btn-layers').addEventListener('click', toggleLayer);
+
+  // 搜索输入实时过滤
+  document.getElementById('search-input').addEventListener('input', (e) => {
+    renderSpotList(e.target.value);
+  });
+
+  // 详情卡片
+  document.getElementById('btn-close-detail').addEventListener('click', closeDetailCard);
+  document.getElementById('btn-navigate').addEventListener('click', () => {
+    if (state.activeSpot) planRoute(state.activeSpot);
+  });
+
+  // 清除路线
+  document.getElementById('btn-clear-route').addEventListener('click', clearRoute);
+
+  // 遮罩层点击关闭搜索
+  document.getElementById('overlay').addEventListener('click', closeSearch);
+}
+
+// =====================================================
+//  启动
+// =====================================================
+document.addEventListener('DOMContentLoaded', () => {
+  initMap();
+  bindEvents();
+});
+</script>
+</body>
+</html>

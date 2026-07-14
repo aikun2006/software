@@ -1,0 +1,401 @@
+{
+  "version": 0.6,
+  "generator": "Overpass API 0.7.62.11 87bfad18",
+  "osm3s": {
+    "timestamp_osm_base": "2026-07-02T02:43:00Z",
+    "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
+  },
+  "elements": [
+
+{
+  "type": "way",
+  "id": 303419019,
+  "tags": {
+    "highway": "tertiary",
+    "oneway": "yes"
+  }
+},
+{
+  "type": "way",
+  "id": 303419020,
+  "tags": {
+    "highway": "tertiary",
+    "oneway": "yes"
+  }
+},
+{
+  "type": "way",
+  "id": 303610761,
+  "tags": {
+    "highway": "footway"
+  }
+},
+{
+  "type": "way",
+  "id": 303610762,
+  "tags": {
+    "highway": "service"
+  }
+},
+{
+  "type": "way",
+  "id": 303610763,
+  "tags": {
+    "highway": "footway"
+  }
+},
+{
+  "type": "way",
+  "id": 303610765,
+  "tags": {
+    "highway": "footway"
+  }
+},
+{
+  "type": "way",
+  "id": 303610766,
+  "tags": {
+    "highway": "footway"
+  }
+},
+{
+  "type": "way",
+  "id": 303610767,
+  "tags": {
+    "highway": "service"
+  }
+},
+{
+  "type": "way",
+  "id": 303610768,
+  "tags": {
+    "highway": "footway"
+  }
+},
+{
+  "type": "way",
+  "id": 316448009,
+  "tags": {
+    "highway": "footway"
+  }
+},
+{
+  "type": "way",
+  "id": 316448013,
+  "tags": {
+    "highway": "footway"
+  }
+},
+{
+  "type": "way",
+  "id": 316448017,
+  "tags": {
+    "highway": "footway"
+  }
+},
+{
+  "type": "way",
+  "id": 316448031,
+  "tags": {
+    "highway": "footway"
+  }
+},
+{
+  "type": "way",
+  "id": 316448032,
+  "tags": {
+    "highway": "footway"
+  }
+},
+{
+  "type": "way",
+  "id": 316448033,
+  "tags": {
+    "highway": "footway"
+  }
+},
+{
+  "type": "way",
+  "id": 316448034,
+  "tags": {
+    "highway": "footway"
+  }
+},
+{
+  "type": "way",
+  "id": 316448035,
+  "tags": {
+    "highway": "footway"
+  }
+},
+{
+  "type": "way",
+  "id": 316448036,
+  "tags": {
+    "highway": "footway"
+  }
+},
+{
+  "type": "way",
+  "id": 708421464,
+  "tags": {
+    "highway": "service"
+  }
+},
+{
+  "type": "way",
+  "id": 708421466,
+  "tags": {
+    "highway": "steps"
+  }
+},
+{
+  "type": "way",
+  "id": 708421467,
+  "tags": {
+    "highway": "footway"
+  }
+},
+{
+  "type": "way",
+  "id": 708421468,
+  "tags": {
+    "bridge": "yes",
+    "highway": "footway",
+    "layer": "1"
+  }
+},
+{
+  "type": "way",
+  "id": 708421469,
+  "tags": {
+    "highway": "footway"
+  }
+},
+{
+  "type": "way",
+  "id": 708421474,
+  "tags": {
+    "highway": "footway"
+  }
+},
+{
+  "type": "way",
+  "id": 708424602,
+  "tags": {
+    "highway": "footway"
+  }
+},
+{
+  "type": "way",
+  "id": 708424607,
+  "tags": {
+    "highway": "unclassified"
+  }
+},
+{
+  "type": "way",
+  "id": 805177251,
+  "tags": {
+    "highway": "track",
+    "source": "digitalglobe"
+  }
+},
+{
+  "type": "way",
+  "id": 805177252,
+  "tags": {
+    "highway": "residential",
+    "source": "digitalglobe"
+  }
+},
+{
+  "type": "way",
+  "id": 805177253,
+  "tags": {
+    "highway": "track",
+    "source": "digitalglobe"
+  }
+},
+{
+  "type": "way",
+  "id": 805177254,
+  "tags": {
+    "bridge": "yes",
+    "highway": "residential",
+    "layer": "1",
+    "source": "digitalglobe"
+  }
+},
+{
+  "type": "way",
+  "id": 805177319,
+  "tags": {
+    "highway": "tertiary"
+  }
+},
+{
+  "type": "way",
+  "id": 920618383,
+  "tags": {
+    "highway": "footway",
+    "layer": "-1",
+    "source": "maxar"
+  }
+},
+{
+  "type": "way",
+  "id": 920618384,
+  "tags": {
+    "highway": "footway",
+    "source": "maxar"
+  }
+},
+{
+  "type": "way",
+  "id": 920618385,
+  "tags": {
+    "highway": "footway",
+    "source": "maxar"
+  }
+},
+{
+  "type": "way",
+  "id": 920618386,
+  "tags": {
+    "highway": "footway",
+    "source": "maxar"
+  }
+},
+{
+  "type": "way",
+  "id": 920618387,
+  "tags": {
+    "highway": "footway",
+    "source": "maxar"
+  }
+},
+{
+  "type": "way",
+  "id": 929943524,
+  "tags": {
+    "highway": "service",
+    "source": "maxar"
+  }
+},
+{
+  "type": "way",
+  "id": 929943525,
+  "tags": {
+    "highway": "residential",
+    "source": "maxar"
+  }
+},
+{
+  "type": "way",
+  "id": 929943526,
+  "tags": {
+    "highway": "residential",
+    "source": "maxar"
+  }
+},
+{
+  "type": "way",
+  "id": 929943527,
+  "tags": {
+    "highway": "service",
+    "source": "maxar"
+  }
+},
+{
+  "type": "way",
+  "id": 929943528,
+  "tags": {
+    "highway": "service",
+    "source": "maxar"
+  }
+},
+{
+  "type": "way",
+  "id": 929943529,
+  "tags": {
+    "highway": "service",
+    "source": "maxar"
+  }
+},
+{
+  "type": "way",
+  "id": 929943533,
+  "tags": {
+    "highway": "footway",
+    "source": "maxar"
+  }
+},
+{
+  "type": "way",
+  "id": 929943534,
+  "tags": {
+    "highway": "service",
+    "source": "maxar"
+  }
+},
+{
+  "type": "way",
+  "id": 1219926288,
+  "tags": {
+    "highway": "residential"
+  }
+},
+{
+  "type": "way",
+  "id": 1219926290,
+  "tags": {
+    "highway": "service"
+  }
+},
+{
+  "type": "way",
+  "id": 1359777215,
+  "tags": {
+    "area": "yes",
+    "highway": "pedestrian"
+  }
+},
+{
+  "type": "way",
+  "id": 1359777224,
+  "tags": {
+    "highway": "footway"
+  }
+},
+{
+  "type": "way",
+  "id": 1359777225,
+  "tags": {
+    "highway": "steps"
+  }
+},
+{
+  "type": "way",
+  "id": 1359777226,
+  "tags": {
+    "highway": "footway"
+  }
+},
+{
+  "type": "way",
+  "id": 1359777227,
+  "tags": {
+    "highway": "footway"
+  }
+},
+{
+  "type": "way",
+  "id": 1359777228,
+  "tags": {
+    "highway": "footway"
+  }
+}
+
+  ]
+}
