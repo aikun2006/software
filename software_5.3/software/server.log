@@ -1,0 +1,83 @@
+[Avatar] 内置数字人已就绪（3个）
+灵山导览服务器: http://localhost:8080
+访问口令: lingshan2026（环境变量 LINGSHAN_PASS 可覆盖）
+文本AI: 智谱 GLM-4-Flash
+多模态: 智谱 GLM-4V-Flash
+TTS语音: 微软晓晓 (zh-CN-XiaoxiaoNeural)
+游客用户: SQLite (lingshan_users.db)
+[17/Jul/2026 10:18:00] "GET / HTTP/1.1" 200 -
+[17/Jul/2026 10:18:00] "GET /favicon.ico HTTP/1.1" 200 -
+[17/Jul/2026 10:18:08] "POST /api/login HTTP/1.1" 200 -
+登录成功，已签发会话。
+[17/Jul/2026 10:18:09] "GET / HTTP/1.1" 200 -
+[17/Jul/2026 10:18:09] "GET /assets/uni.40cb137a.css HTTP/1.1" 200 -
+[17/Jul/2026 10:18:09] "GET /assets/index-CAt-BZAD.css HTTP/1.1" 200 -
+[17/Jul/2026 10:18:09] "GET /assets/index-CWIRvjoY.js HTTP/1.1" 200 -
+[17/Jul/2026 10:18:09] "GET /static/icons/tab-home.png HTTP/1.1" 200 -
+[17/Jul/2026 10:18:09] "GET /assets/Avatar3D-CZ862i-M.css HTTP/1.1" 200 -
+[17/Jul/2026 10:18:09] "GET /assets/index-cReMoWFV.css HTTP/1.1" 200 -
+[17/Jul/2026 10:18:09] "GET /assets/pages-visitor-index.BJXZlGWt.js HTTP/1.1" 200 -
+[17/Jul/2026 10:18:09] "GET /assets/Avatar3D.SpDRsEJU.js HTTP/1.1" 200 -
+[17/Jul/2026 10:18:09] "GET /assets/ttsEngine.ETKHMXhe.js HTTP/1.1" 200 -
+[17/Jul/2026 10:18:09] "GET /assets/_plugin-vue_export-helper.BCo6x5W8.js HTTP/1.1" 200 -
+[17/Jul/2026 10:18:10] "GET /assets/index.C8zsdRKL.js HTTP/1.1" 200 -
+[17/Jul/2026 10:18:10] "GET /static/icons/tab-chat.png HTTP/1.1" 200 -
+[17/Jul/2026 10:18:10] "GET /static/icons/tab-map.png HTTP/1.1" 200 -
+[17/Jul/2026 10:18:10] "GET /static/icons/tab-profile.png HTTP/1.1" 200 -
+[17/Jul/2026 10:18:10] "GET /static/icons/tab-spots.png HTTP/1.1" 200 -
+[17/Jul/2026 10:18:10] "GET /api/avatars/active HTTP/1.1" 200 -
+[17/Jul/2026 10:18:10] "GET /static/avatars/use_for_app1.vrm HTTP/1.1" 200 -
+[17/Jul/2026 10:18:10] "GET /api/avatars/active HTTP/1.1" 200 -
+[17/Jul/2026 10:18:10] "GET /static/spots/fangong-square.jpg HTTP/1.1" 200 -
+[17/Jul/2026 10:18:10] "GET /static/spots/lingshan-dafo.jpg HTTP/1.1" 200 -
+[17/Jul/2026 10:18:10] "GET /static/spots/wuyin-tancheng.jpg HTTP/1.1" 200 -
+[17/Jul/2026 10:18:10] "GET /static/spots/lingshan-fangong.jpg HTTP/1.1" 200 -
+[17/Jul/2026 10:18:11] "GET /static/spots/lingshan-jingshe.jpg HTTP/1.1" 200 -
+[17/Jul/2026 10:18:11] "GET /static/spots/manfeilong-ta.jpg HTTP/1.1" 200 -
+[17/Jul/2026 10:18:11] "GET /static/spots/baizi-mile.jpg HTTP/1.1" 200 -
+[17/Jul/2026 10:18:11] "GET /static/spots/xiangfu-temple.jpg HTTP/1.1" 200 -
+[17/Jul/2026 10:18:11] "GET /static/spots/jiulong-guanyu.jpg HTTP/1.1" 200 -
+[17/Jul/2026 10:18:11] "GET /static/spots/fozu-tan.jpg HTTP/1.1" 200 -
+[17/Jul/2026 10:18:12] code 404, message File not found
+[17/Jul/2026 10:18:12] "GET /static/icons/home.png HTTP/1.1" 404 -
+[17/Jul/2026 10:18:13] "GET /static/prompt.mp3 HTTP/1.1" 200 -
+[17/Jul/2026 10:18:13] code 404, message File not found
+[17/Jul/2026 10:18:13] "GET /static/icons/home.png HTTP/1.1" 404 -
+[17/Jul/2026 10:18:14] "GET /assets/pages-visitor-spots.DAJa04Vp.js HTTP/1.1" 200 -
+[17/Jul/2026 10:18:14] "GET /assets/spots-DRRVSXmW.css HTTP/1.1" 200 -
+[17/Jul/2026 10:18:14] "GET /assets/spots.BhECVK1o.js HTTP/1.1" 200 -
+[17/Jul/2026 10:18:14] "GET /assets/search.CAYWiRwL.js HTTP/1.1" 200 -
+[17/Jul/2026 10:18:14] "GET /static/icons/search.png HTTP/1.1" 200 -
+[17/Jul/2026 10:18:14] "GET /static/spots/buddha-1.jpg HTTP/1.1" 200 -
+[17/Jul/2026 10:18:14] "GET /static/spots/xiangfu-1.jpg HTTP/1.1" 200 -
+[17/Jul/2026 10:18:14] "GET /static/spots/wujinyi-1.jpg HTTP/1.1" 200 -
+[17/Jul/2026 10:18:14] "GET /static/spots/palm-1.jpg HTTP/1.1" 200 -
+[17/Jul/2026 10:18:14] "GET /static/spots/ayuwang-1.jpg HTTP/1.1" 200 -
+[17/Jul/2026 10:18:15] "GET /static/spots/jiulong-1.jpg HTTP/1.1" 200 -
+[17/Jul/2026 10:18:15] "GET /static/spots/fangsheng-1.jpg HTTP/1.1" 200 -
+[17/Jul/2026 10:18:15] "GET /static/spots/baizi-1.jpg HTTP/1.1" 200 -
+[17/Jul/2026 10:18:15] "GET /static/spots/wuyin-1.jpg HTTP/1.1" 200 -
+[17/Jul/2026 10:18:15] "GET /static/spots/fangong-1.jpg HTTP/1.1" 200 -
+[17/Jul/2026 10:18:15] "GET /static/spots/qifu-1.jpg HTTP/1.1" 200 -
+[17/Jul/2026 10:18:15] "GET /static/spots/manfeilong-1.jpg HTTP/1.1" 200 -
+[17/Jul/2026 10:18:15] "GET /static/spots/talong-1.jpg HTTP/1.1" 200 -
+[17/Jul/2026 10:18:15] "GET /assets/chat-BdMIo7Q4.css HTTP/1.1" 200 -
+[17/Jul/2026 10:18:15] "GET /assets/qa-bank.qxJK_UQG.js HTTP/1.1" 200 -
+[17/Jul/2026 10:18:15] "GET /assets/pages-visitor-chat.rspyceK3.js HTTP/1.1" 200 -
+[17/Jul/2026 10:18:15] "GET /assets/mock.DhoP2IIB.js HTTP/1.1" 200 -
+[17/Jul/2026 10:18:15] "GET /api/avatars/active HTTP/1.1" 200 -
+[17/Jul/2026 10:18:16] "GET /static/avatars/use_for_app1.vrm HTTP/1.1" 200 -
+[17/Jul/2026 10:18:16] "GET /api/avatars/active HTTP/1.1" 200 -
+[17/Jul/2026 10:18:16] "GET /static/camera-icon.png HTTP/1.1" 200 -
+[17/Jul/2026 10:18:16] "GET /assets/pages-visitor-location.Dw-925Ta.js HTTP/1.1" 200 -
+[17/Jul/2026 10:18:17] "GET /assets/location-SJse3qyc.css HTTP/1.1" 200 -
+[17/Jul/2026 10:18:17] "GET /assets/lingshan-map.B6xJ23jo.js HTTP/1.1" 200 -
+[17/Jul/2026 10:18:17] "GET /static/lingshan-map.jpg HTTP/1.1" 200 -
+[17/Jul/2026 10:18:18] "GET /api/avatars/active HTTP/1.1" 200 -
+[17/Jul/2026 10:18:20] "GET /api/avatars/active HTTP/1.1" 200 -
+[17/Jul/2026 10:18:25] "GET /api/avatars/active HTTP/1.1" 200 -
+[17/Jul/2026 10:18:28] "GET /assets/profile-D5hghBeN.css HTTP/1.1" 200 -
+[17/Jul/2026 10:18:28] "GET /assets/pages-visitor-profile.DPe0NEtj.js HTTP/1.1" 200 -
+[17/Jul/2026 10:18:29] "GET /api/avatars/active HTTP/1.1" 200 -
+[17/Jul/2026 10:18:34] "POST /api/shutdown HTTP/1.1" 200 -
+收到关闭请求，服务器退出。
